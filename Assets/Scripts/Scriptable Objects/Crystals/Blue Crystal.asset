@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bb4a6314547e8e14996c67396d5166ae, type: 3}
-  m_Name: Green Crystal
+  m_Name: Blue Crystal
   m_EditorClassIdentifier: 
-  Prefab: {fileID: 315505252443607286, guid: 49ade789519878b4cb4a78b315bba58e, type: 3}
-  Type: 2
+  Prefab: {fileID: 4786402657035695583, guid: d6c6a690b71b6284da501dbbdee08438, type: 3}
+  Type: 0

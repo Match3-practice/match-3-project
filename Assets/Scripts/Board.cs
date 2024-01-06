@@ -7,7 +7,9 @@ using UnityEngine;
 public class Board : MonoBehaviour
 {
     private Cell[,] Cells;
+    [SerializeField]
     private int _width = 5;
+    [SerializeField]
     private int _height = 5;
     public Direction Gravity;
 
