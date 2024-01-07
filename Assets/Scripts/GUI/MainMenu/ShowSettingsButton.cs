@@ -30,7 +30,7 @@ namespace GUI.MainMenu
             if (Panel.IsActive != true && Panel != null)
             {
                 Panel.transform.DOMove(TargetPosition.position, Duration);
-                Panel.IsActive = true;
+                Panel.SetPanelActive(true);
             }
         }
     }

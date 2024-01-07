@@ -6,7 +6,6 @@ namespace GUI.MainMenu
     public class HideSettingsButton : MonoBehaviour
     {
         [SerializeField] private SettingsPanel Panel = null;
-        [SerializeField] private Transform TargetPosition = null;
 
         private float Duration = 1f;
 
@@ -30,7 +29,7 @@ namespace GUI.MainMenu
             if (Panel.IsActive != false && Panel != null)
             {
                 Panel.transform.DOMove(Panel.OriginalPosition, Duration);
-                Panel.IsActive = false;
+                Panel.SetPanelActive(false);
             }
         }
     }
