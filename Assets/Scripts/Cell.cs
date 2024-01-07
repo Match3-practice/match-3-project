@@ -10,6 +10,20 @@ public enum Direction
     Bottom,
     None
 }
+
+public struct Neighbors
+{
+    public Cell _left_cell;
+    public Cell _right_cell;
+    public Cell _top_cell;
+    public Cell _bottom_cell;
+
+    public Cell _left_top_cell;
+    public Cell _right_top_cell;
+    public Cell _left_bottom_cell;
+    public Cell _right_bottom_cell;
+
+}
 public class Cell
 {
     public Crystal Crystal
@@ -19,30 +33,33 @@ public class Cell
         {
             _crystal = value;
             if (_crystal == null)
-                IsEmpty = false;
-            else IsEmpty = true;
+            {
+                IsEmpty = true;
+            }
+            else
+            {
+                _crystal.ChangePositionInBoard(this);
+                IsEmpty = false; 
+            }
         }
     }
 
     private Crystal _crystal;
     public Direction Gravity;
+    private Neighbors _neighbors;
+    public Vector2 Position;
+
     public bool IsEmpty { get; private set; } = false;
-    private Cell _left_cell;
-    private Cell _right_cell;
-    private Cell _top_cell;
-    private Cell _bottom_cell;
 
 
-    public Cell(Crystal crystal, Cell left_cell,
-        Cell right_cell,Cell top_cell,Cell bottom_cell, Direction gravity)
+    public Cell(Crystal crystal, Direction gravity)
     {
         Crystal = crystal;
-        Crystal.Move += TrySwap;
-        _left_cell = left_cell;
-        _right_cell = right_cell;
-        _top_cell = top_cell;
-        _bottom_cell = bottom_cell;
         Gravity = gravity;
+    }
+    public void SetNeighbors(Neighbors neighbors)
+    {
+        _neighbors = neighbors;
     }
 
     public void TrySwap(Direction direction)
@@ -57,9 +74,17 @@ public class Cell
     }
     private void SwapWithNeighbor(Cell neighbor)
     {
+        UpdatePositionInfo();
+        neighbor.UpdatePositionInfo();
+
         Crystal temporary = neighbor.Crystal;
         neighbor.Crystal = Crystal;
         Crystal = temporary;
+    }
+
+    public void UpdatePositionInfo()
+    {
+        Position = _crystal.Position;
     }
 
     private bool CanSwap(Direction direction)
@@ -83,13 +108,13 @@ public class Cell
         switch (direction)
         {
             case Direction.Bottom:
-                return _bottom_cell;
+                return _neighbors._bottom_cell;
             case Direction.Top:
-                return _top_cell;
+                return _neighbors._top_cell;
             case Direction.Left:
-                return _left_cell;
+                return _neighbors._left_cell;
             case Direction.Right:
-                return _right_cell;
+                return _neighbors._right_cell;
             default:
                 return null;
         }
