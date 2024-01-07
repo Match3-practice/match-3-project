@@ -1,18 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class ExitButton : MonoBehaviour
+namespace GUI.MainMenu
 {
-    // Start is called before the first frame update
-    void Start()
+    public class ExitButton : MonoBehaviour
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public void ExitGame()
+        {
+            Application.Quit();
+        }
     }
 }

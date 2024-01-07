@@ -1,18 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using DG.Tweening;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class StartButton : MonoBehaviour
+namespace GUI.MainMenu
 {
-    // Start is called before the first frame update
-    void Start()
+    public class StartButton : MonoBehaviour
     {
-        
-    }
+        public void OnButtonClick()
+        {
+            DOTween.Sequence()
+                .Append(transform.DOScale(0.75f, 0.5f))
+                .Append(transform.DOScale(1f, 0.5f))
+                .AppendInterval(0.3f)
+                .OnComplete(LoadScene);
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        private void LoadScene()
+        {
+            SceneManager.LoadScene("Scenes/GameplayScene(Lv0)");
+        }
     }
 }
