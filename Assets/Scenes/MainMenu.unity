@@ -225,6 +225,7 @@ GameObject:
   - component: {fileID: 94614305}
   - component: {fileID: 94614304}
   - component: {fileID: 94614303}
+  - component: {fileID: 94614306}
   m_Layer: 5
   m_Name: ToggleMuteButton
   m_TagString: Untagged
@@ -294,7 +295,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 94614304}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 94614306}
+        m_TargetAssemblyTypeName: MuteToggleButton, Assembly-CSharp
+        m_MethodName: OnButtonClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &94614304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -333,6 +346,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 94614301}
   m_CullTransparentMesh: 1
+--- !u!114 &94614306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 94614301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ce341177c04bc9469292abac8e44e9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sprite:
+  - {fileID: -213356348, guid: 156ec492e516ccb4099add479601d65e, type: 3}
+  - {fileID: 1897002124, guid: 156ec492e516ccb4099add479601d65e, type: 3}
 --- !u!1 &109597809
 GameObject:
   m_ObjectHideFlags: 0
@@ -1494,6 +1522,7 @@ GameObject:
   - component: {fileID: 1076820780}
   - component: {fileID: 1076820779}
   - component: {fileID: 1076820778}
+  - component: {fileID: 1076820781}
   m_Layer: 5
   m_Name: ToggleMusicButton
   m_TagString: Untagged
@@ -1563,7 +1592,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1076820779}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1076820781}
+        m_TargetAssemblyTypeName: MuteToggleButton, Assembly-CSharp
+        m_MethodName: OnButtonClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1076820779
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1602,6 +1643,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1076820776}
   m_CullTransparentMesh: 1
+--- !u!114 &1076820781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1076820776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ce341177c04bc9469292abac8e44e9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sprite:
+  - {fileID: -663011761, guid: 156ec492e516ccb4099add479601d65e, type: 3}
+  - {fileID: 53940023, guid: 156ec492e516ccb4099add479601d65e, type: 3}
 --- !u!1 &1144554549
 GameObject:
   m_ObjectHideFlags: 0
@@ -2347,8 +2403,8 @@ RectTransform:
   m_Children:
   - {fileID: 1457873072}
   - {fileID: 174812999}
-  - {fileID: 1026237553}
   - {fileID: 94614302}
+  - {fileID: 1026237553}
   - {fileID: 1076820777}
   - {fileID: 1720909478}
   - {fileID: 2016236334}
