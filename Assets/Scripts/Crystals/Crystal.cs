@@ -6,7 +6,9 @@ public class Crystal : MonoBehaviour
     private event Action<Direction> _interactAction;
     public Interaction _interactionSystem;
     public Vector2 Position { get => transform.localPosition; }
+    public Types Type { get; set; }
 
+    public bool MustDestroy { get; set; } = false;
     private void Start()
     {
         _interactionSystem = gameObject.AddComponent<Interaction>();        
@@ -36,5 +38,10 @@ public class Crystal : MonoBehaviour
     public void SubscribeIntercationAction(Action<Direction> action)
     {
         _interactAction += action;
+    }
+
+    public void Destroy()
+    {
+        Destroy(gameObject);
     }
 }

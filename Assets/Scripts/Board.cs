@@ -16,6 +16,10 @@ public class Board : MonoBehaviour
 
     [SerializeField]
     private CrystalData[] _setOfCrystals;
+    [SerializeField]
+    private GameObject _cellPrefab;
+
+    public event Action _startCheckingMatch;
 
     void Start()
     {
@@ -29,8 +33,9 @@ public class Board : MonoBehaviour
         {
             for (int j = 0; j < _width; j++)
             {
-                Crystal crystal = GenerateCrystal();
-                Cells[j, i] = new Cell(crystal, Gravity);
+                GameObject cellObject = Instantiate(_cellPrefab, transform);
+                Crystal crystal = GenerateCrystalInCell(cellObject);
+                Cells[j, i] = new Cell(crystal, Gravity, cellObject,this);
             }
         }
 
@@ -43,6 +48,11 @@ public class Board : MonoBehaviour
         }
     }
 
+    public void StartCheckingMatch()
+    {
+        Debug.Log("Start Cheking");
+        _startCheckingMatch?.Invoke();
+    }
     private Neighbors FillNeighbors(int indexI, int indexJ)
     {
         Neighbors neighbors = new Neighbors();
@@ -60,13 +70,15 @@ public class Board : MonoBehaviour
         return neighbors;
     }
 
-    private Crystal GenerateCrystal()
+    private Crystal GenerateCrystalInCell(GameObject cell)
     {
         try
         {
             CrystalData crystalData = _setOfCrystals[UnityEngine.Random.Range(0, _setOfCrystals.Length)];
-            GameObject crystalPrefab = Instantiate(crystalData.Prefab, transform);
-            return crystalPrefab.GetComponent<Crystal>();
+            GameObject crystalPrefab = Instantiate(crystalData.Prefab, cell.transform);
+            Crystal crystal = crystalPrefab.GetComponent<Crystal>();
+            crystal.Type = crystalData.Type;
+            return crystal;
         }
         catch (IndexOutOfRangeException)
         {

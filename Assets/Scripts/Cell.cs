@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,17 +25,19 @@ public struct Neighbors
     public Cell _right_bottom_cell;
 
 }
-public class Cell
+public class Cell 
 {
     public Crystal Crystal
     {
         get => _crystal;
         private set
         {
+            Crystal oldCrystal = _crystal;
             _crystal = value;
             if (_crystal == null)
             {
                 IsEmpty = true;
+                oldCrystal.Destroy();
             }
             else
             {
@@ -43,19 +46,20 @@ public class Cell
             }
         }
     }
-
+    public GameObject _prefab;
     private Crystal _crystal;
     public Direction Gravity;
     private Neighbors _neighbors;
     public Vector2 Position;
-
     public bool IsEmpty { get; private set; } = false;
 
-
-    public Cell(Crystal crystal, Direction gravity)
+    public event Action EndSwapping;
+    public Cell(Crystal crystal, Direction gravity, GameObject prefab, Board parent)
     {
         Crystal = crystal;
         Gravity = gravity;
+        _prefab = prefab;
+        Subscribe(parent);
     }
     public void SetNeighbors(Neighbors neighbors)
     {
@@ -80,6 +84,8 @@ public class Cell
         Crystal temporary = neighbor.Crystal;
         neighbor.Crystal = Crystal;
         Crystal = temporary;
+
+        EndSwapping?.Invoke();
     }
 
     public void UpdatePositionInfo()
@@ -90,9 +96,9 @@ public class Cell
     private bool CanSwap(Direction direction)
     {
         Cell neighbor = GetNeighbor(direction);
-        return neighbor==null? false : !neighbor.IsEmpty;
+        return neighbor==null ? false : !neighbor.IsEmpty;
     }
-
+    
     private void MoveToEmptySpace(Cell cell)
     {
         Cell neighbor = cell?.GetNeighbor(Gravity);
@@ -103,6 +109,38 @@ public class Cell
         MoveToEmptySpace(neighbor);
     }
 
+    private void CheckNeighborsMatch(Cell cell, Direction direction)
+    {
+        Cell neighbor = cell?.GetNeighbor(direction);
+        if (neighbor == null || neighbor.Crystal.Type != cell.Crystal.Type)
+        {
+            cell.Crystal = null;
+            return;
+        }
+        neighbor.Crystal.MustDestroy = true;
+        Debug.Log($"Match: {neighbor.Crystal.Type}");
+        CheckNeighborsMatch(neighbor, direction);
+    }
+
+    public void CheckMatch()
+    {
+        Cell neighborLeft = GetNeighbor(Direction.Left);
+        if (neighborLeft == null)
+            return;
+        Cell neighborRight = GetNeighbor(Direction.Right);
+        if (neighborRight == null)
+            return;
+        if (neighborLeft.Crystal.Type == Crystal.Type
+            && neighborRight.Crystal.Type == Crystal.Type)
+        {
+            Debug.Log($"Match: {Crystal.Type}");
+            Crystal.MustDestroy = true;
+            CheckNeighborsMatch(this, Direction.Right);
+            CheckNeighborsMatch(this, Direction.Left);
+            Crystal = null;
+        }
+        //CheckNeighborsMatch(this, Direction.Bottom);
+    }
     public Cell GetNeighbor(Direction direction)
     {
         switch (direction)
@@ -119,4 +157,10 @@ public class Cell
                 return null;
         }
     }
+    private void Subscribe(Board parent)
+    {
+        EndSwapping = parent.StartCheckingMatch;
+        parent._startCheckingMatch += CheckMatch;
+    }
+
 }

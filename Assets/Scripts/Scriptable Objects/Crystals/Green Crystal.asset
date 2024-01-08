@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Green Crystal
   m_EditorClassIdentifier: 
   Prefab: {fileID: 315505252443607286, guid: 49ade789519878b4cb4a78b315bba58e, type: 3}
-  Type: 0
+  Type: 2
