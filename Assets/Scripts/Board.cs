@@ -48,7 +48,10 @@ public class Board : MonoBehaviour
             }
         }
     }
-
+    public void EndSwapping()
+    {
+        StartCheckingMatch();
+    }
     public void StartCheckingMatch()
     {
         Debug.Log("Start Cheking");
