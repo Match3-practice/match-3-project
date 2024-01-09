@@ -34,6 +34,7 @@ public class Board : MonoBehaviour
             for (int j = 0; j < _width; j++)
             {
                 GameObject cellObject = Instantiate(_cellPrefab, transform);
+                cellObject.GetComponent<VerticalLayoutGroup>().childControlHeight = true;
                 Crystal crystal = GenerateCrystalInCell(cellObject);
                 Cells[j, i] = new Cell(crystal, Gravity, cellObject,this);
             }

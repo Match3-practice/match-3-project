@@ -25,7 +25,7 @@ public struct Neighbors
     public Cell _right_bottom_cell;
 
 }
-public class Cell 
+public class Cell
 {
     public Crystal Crystal
     {
@@ -42,7 +42,7 @@ public class Cell
             else
             {
                 _crystal.ChangePositionInBoard(this);
-                IsEmpty = false; 
+                IsEmpty = false;
             }
         }
     }
@@ -56,9 +56,10 @@ public class Cell
     public event Action EndSwapping;
     public Cell(Crystal crystal, Direction gravity, GameObject prefab, Board parent)
     {
-        Crystal = crystal;
-        Gravity = gravity;
         _prefab = prefab;
+        _crystal = crystal;
+        _crystal.SubscribeIntercationAction(TrySwap);
+        Gravity = gravity;
         Subscribe(parent);
     }
     public void SetNeighbors(Neighbors neighbors)
@@ -78,9 +79,6 @@ public class Cell
     }
     private void SwapWithNeighbor(Cell neighbor)
     {
-        UpdatePositionInfo();
-        neighbor.UpdatePositionInfo();
-
         Crystal temporary = neighbor.Crystal;
         neighbor.Crystal = Crystal;
         Crystal = temporary;
@@ -96,9 +94,9 @@ public class Cell
     private bool CanSwap(Direction direction)
     {
         Cell neighbor = GetNeighbor(direction);
-        return neighbor==null ? false : !neighbor.IsEmpty;
+        return neighbor == null ? false : !neighbor.IsEmpty;
     }
-    
+
     private void MoveToEmptySpace(Cell cell)
     {
         Cell neighbor = cell?.GetNeighbor(Gravity);
@@ -125,10 +123,10 @@ public class Cell
     public void CheckMatch()
     {
         Cell neighborLeft = GetNeighbor(Direction.Left);
-        if (neighborLeft == null)
+        if (neighborLeft == null || neighborLeft.Crystal == null)
             return;
         Cell neighborRight = GetNeighbor(Direction.Right);
-        if (neighborRight == null)
+        if (neighborRight == null || neighborRight.Crystal == null)
             return;
         if (neighborLeft.Crystal.Type == Crystal.Type
             && neighborRight.Crystal.Type == Crystal.Type)
@@ -139,7 +137,6 @@ public class Cell
             CheckNeighborsMatch(this, Direction.Left);
             Crystal = null;
         }
-        //CheckNeighborsMatch(this, Direction.Bottom);
     }
     public Cell GetNeighbor(Direction direction)
     {

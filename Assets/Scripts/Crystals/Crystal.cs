@@ -23,7 +23,7 @@ public class Crystal : MonoBehaviour
 
     public void ChangePositionInBoard(Cell newCell)
     {
-        ChangePosition(newCell.Position);
+        gameObject.transform.parent = newCell._prefab.transform;
         UnsubscribeAll();
         SubscribeIntercationAction(newCell.TrySwap);
     }
