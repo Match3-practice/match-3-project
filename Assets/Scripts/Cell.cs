@@ -37,7 +37,7 @@ public class Cell
             if (_crystal == null)
             {
                 IsEmpty = true;
-                oldCrystal.Destroy();
+                oldCrystal?.Destroy();
             }
             else
             {
@@ -112,16 +112,17 @@ public class Cell
         Cell neighbor = cell?.GetNeighbor(direction);
         if (neighbor == null || neighbor.Crystal.Type != cell.Crystal.Type)
         {
-            cell.Crystal = null;
             return;
         }
         neighbor.Crystal.MustDestroy = true;
         Debug.Log($"Match: {neighbor.Crystal.Type}");
         CheckNeighborsMatch(neighbor, direction);
+        neighbor.Crystal = null;
     }
 
     public void CheckMatch()
     {
+        if(Crystal == null) { return; }
         Cell neighborLeft = GetNeighbor(Direction.Left);
         if (neighborLeft == null || neighborLeft.Crystal == null)
             return;
@@ -133,9 +134,11 @@ public class Cell
         {
             Debug.Log($"Match: {Crystal.Type}");
             Crystal.MustDestroy = true;
-            CheckNeighborsMatch(this, Direction.Right);
-            CheckNeighborsMatch(this, Direction.Left);
+            CheckNeighborsMatch(neighborRight, Direction.Right);
+            CheckNeighborsMatch(neighborLeft, Direction.Left);
             Crystal = null;
+            neighborLeft.Crystal = null;
+            neighborRight.Crystal = null;
         }
     }
     public Cell GetNeighbor(Direction direction)
