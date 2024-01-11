@@ -24,7 +24,7 @@ public class Cell
     private Crystal _crystal;
     public Direction Gravity;
     private Neighbors _neighbors;
-    public Vector2 Position;
+    public Transform Position { get => _prefab.transform; }
     public bool IsEmpty { get; private set; } = false;
 
     public event Action EndSwapping;
