@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public enum Direction
@@ -19,34 +17,10 @@ public struct Neighbors
     public Cell _top_cell;
     public Cell _bottom_cell;
 
-    public Cell _left_top_cell;
-    public Cell _right_top_cell;
-    public Cell _left_bottom_cell;
-    public Cell _right_bottom_cell;
-
 }
 public class Cell
 {
-    public Crystal Crystal
-    {
-        get => _crystal;
-        private set
-        {
-            Crystal oldCrystal = _crystal;
-            _crystal = value;
-            if (_crystal == null)
-            {
-                IsEmpty = true;
-                oldCrystal?.Destroy();
-            }
-            else
-            {
-                _crystal.ChangePositionInBoard(this);
-                IsEmpty = false;
-            }
-        }
-    }
-    public GameObject _prefab;
+    private GameObject _prefab;
     private Crystal _crystal;
     public Direction Gravity;
     private Neighbors _neighbors;
@@ -55,6 +29,28 @@ public class Cell
 
     public event Action EndSwapping;
     public event Action EndCheckMatching;
+
+    public Crystal Crystal
+    {
+        get => _crystal;
+        private set
+        {
+            _crystal = value;
+            if (_crystal == null)
+                IsEmpty = true;
+            else
+            {
+                _crystal.ChangePositionInBoard(this);
+                IsEmpty = false;
+            }
+        }
+    }
+
+    #region Initialization
+    /// <param name="crystal">Initial crystal</param>
+    /// <param name="gravity">Direction of falling crystals</param>
+    /// <param name="prefab">Cell prefab</param>
+    /// <param name="parent">Parent board where the cell is located</param>
     public Cell(Crystal crystal, Direction gravity, GameObject prefab, Board parent)
     {
         _prefab = prefab;
@@ -63,11 +59,38 @@ public class Cell
         Gravity = gravity;
         Subscribe(parent);
     }
+
     public void SetNeighbors(Neighbors neighbors)
     {
         _neighbors = neighbors;
     }
+    /// <summary>
+    /// Subscribe parent and cell events
+    /// </summary>
+    private void Subscribe(Board parent)
+    {
+        EndSwapping = parent.EndSwapping;
+        EndCheckMatching = parent.CellEndCheckMaching;
+        parent._startCheckingMatch += CheckMatch;
+    }
+    #endregion
 
+    //########################
+    //Swapping
+    /// <summary>
+    /// Checks whether the crystal can be moved and moves it
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item>
+    /// <term>direction</term>
+    /// <description>
+    /// Swap direction
+    /// </description>
+    /// </item>
+    /// </list>
+    /// </remarks>
+    /// <param name="direction">Swap direction</param>
     public void TrySwap(Direction direction)
     {
         if (!CanSwap(direction))
@@ -81,105 +104,84 @@ public class Cell
             Debug.LogError($"The neighbor doesn't exist. Direction: {direction}");
         SwapWithNeighbor(neighbor);
     }
+
+    /// <summary>
+    /// Exchanges crystals with the cell neighbor
+    /// </summary>
+    /// <param name="neighbor">The adjacent cell 
+    /// with which there will be a swap attempt</param>
     private void SwapWithNeighbor(Cell neighbor)
     {
         Crystal temporary = neighbor.Crystal;
         neighbor.Crystal = Crystal;
         Crystal = temporary;
-
         EndSwapping?.Invoke();
     }
 
-    public void UpdatePositionInfo()
-    {
-        Position = _crystal.Position;
-    }
-
+    /// <summary>
+    /// Checks whether crystals can be swapped
+    /// </summary>
+    /// <returns>Returns <see langword="true"/> if a swap can be made</returns>
     private bool CanSwap(Direction direction)
     {
         Cell neighbor = GetNeighbor(direction);
         return neighbor == null ? false : !neighbor.IsEmpty;
     }
 
-    private void StartMovementToEmptySpaces()
-    {
-        //Debug.Log("Start Movement To Empty Spaces");
-        MoveToEmptySpace(this);
-    }
-    private void MoveToEmptySpace(Cell cell)
-    {
-        Cell neighbor = cell?.GetNeighbor(Gravity);
-        if (neighbor == null || !neighbor.IsEmpty  )
-            return;
-        neighbor.Crystal = cell.Crystal;
-        cell.Crystal = null;
-        MoveToEmptySpace(neighbor);
-    }
+    //##################
+    //Match
 
-    private void CheckNeighborsMatch(Cell cell, Direction direction)
-    {
-        Cell neighbor = cell?.GetNeighbor(direction);
-        if (neighbor == null || neighbor.Crystal == null || neighbor.Crystal.Type != cell.Crystal.Type)
-        {
-            cell.Crystal.MustDestroy = true;
-            cell.Crystal = null;
-            return;
-        }
-        Debug.Log($"Match: {neighbor.Crystal.Type}");
-        CheckNeighborsMatch(neighbor, direction);
-        cell.Crystal.MustDestroy = true;
-        
-    }
-
+    /// <summary>
+    /// The main method for checking match
+    /// </summary>
     public void CheckMatch()
     {
         if (Crystal != null)
-            CheckMatchByDirection(Direction.Right);
+            CheckMatchByDirection(Direction.Right, GetReverseDirection(Direction.Right));
         if (Crystal != null)
-            CheckMatchByDirection(Direction.Top);
-        if(Crystal != null && Crystal.MustDestroy)
-            Crystal = null;
+            CheckMatchByDirection(Direction.Top, GetReverseDirection(Direction.Top));
+        if (Crystal != null && Crystal.MustDestroy)
+        {
+            Crystal.MustDestroy = true;
+        }
         EndCheckMatching?.Invoke();
     }
 
-    //################
-    //Version 1
-    private void CheckMatchByDirections(Direction directionForward, Direction directionReverse)
+    /// <summary>
+    /// Ñhecks matches with all neighbors in two directions
+    /// </summary>
+    /// <param name="direction">Forward direction</param>
+    /// <param name="directionReverse">Reverse direction</param>
+    private void CheckMatchByDirection(Direction direction, Direction directionReverse)
     {
-        Cell neighborForward = GetNeighbor(directionForward);
-        if (neighborForward == null || neighborForward.Crystal == null)
-            return;
-        Cell neighborReverse = GetNeighbor(directionReverse);
-        if (neighborReverse == null || neighborReverse.Crystal == null)
-            return;
-        if (neighborForward.Crystal.Type == Crystal.Type
-            && neighborReverse.Crystal.Type == Crystal.Type)
+        if (HasNeighborSameTypeCrystal(direction) && HasNeighborSameTypeCrystal(directionReverse))
         {
-            Debug.Log($"Match: {Crystal.Type}");
-            Crystal.MustDestroy = true;
-            CheckNeighborsMatch(neighborReverse, Direction.Right);
-            CheckNeighborsMatch(neighborForward, Direction.Left);
-            Crystal = null;
-        }
-    }
-
-    //################
-    //Version 2
-    private void CheckMatchByDirection(Direction direction)
-    {
-        if (HasNeighborSameTypeCrystal(direction) && HasNeighborSameTypeCrystal(GetReverseDirection(direction)))
-        {
-            Direction directionReverse = GetReverseDirection(direction);
             Cell neighborForward = GetNeighbor(direction);
             Cell neighborBackward = GetNeighbor(directionReverse);
 
             Debug.Log($"Match: {Crystal.Type}");
-            Crystal.MustDestroy = true;
             CheckNeighborsMatch(neighborForward, direction);
             CheckNeighborsMatch(neighborBackward, directionReverse);
-            Crystal = null;
+            Crystal.MustDestroy = true;
         }
     }
+
+    ///<summary>
+    ///Checks if crystal match with neighbor's crystal
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item>
+    /// <term>direction</term>
+    /// <description>
+    /// The direction of the neighbor's location relative to the current crystal
+    /// </description>
+    /// </item>
+    /// </list>
+    /// </remarks>
+    /// /// <returns>
+    /// Returns <see langword="true"/> if the types match and <see langword="false"/>  if the types do not match or the neighbor is empty.
+    /// </returns>
     private bool HasNeighborSameTypeCrystal(Direction direction)
     {
         Cell neighbor = GetNeighbor(direction);
@@ -189,6 +191,70 @@ public class Cell
             return false;
         return true;
     }
+
+    /// <summary>
+    /// Checks matches with all neighbors
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item>
+    /// <term>cell</term>
+    /// <description>
+    /// The cell with which we compare neighbors
+    /// </description>
+    /// </item>
+    /// <item>
+    /// <term>direction</term>
+    /// <description>
+    /// The direction of the neighbor's location relative to the current crystal
+    /// </description>
+    /// </item>
+    /// </list>
+    /// </remarks>
+    private void CheckNeighborsMatch(Cell cell, Direction direction)
+    {
+        Cell neighbor = cell?.GetNeighbor(direction);
+        //until the neighboring crystal is of a different type
+        if (neighbor == null || neighbor.Crystal == null || neighbor.Crystal.Type != cell.Crystal.Type)
+        {
+            cell.Crystal.MustDestroy = true;
+            return;
+        }
+        Debug.Log($"Match: {neighbor.Crystal.Type}");
+        CheckNeighborsMatch(neighbor, direction);
+        cell.Crystal.MustDestroy = true;
+    }
+
+    //###############
+    //Move To Empty Spaces
+
+    public void TryMoveCrystalToEmptySpaces()
+    {
+        if (Crystal != null)
+            MoveToEmptySpace(this);
+    }
+    private void MoveToEmptySpace(Cell cell)
+    {
+        Cell neighbor = cell?.GetNeighbor(Gravity);
+        if (neighbor == null || !neighbor.IsEmpty)
+            return;
+        neighbor.Crystal = cell.Crystal;
+        cell.Crystal = null;
+        MoveToEmptySpace(neighbor);
+    }
+    
+    
+    public bool ClearCrystal()
+    {
+        if (Crystal != null && Crystal.MustDestroy)
+        {
+            Crystal.Destroy();
+            Crystal = null;
+            return true;
+        }
+        return false;
+    }
+
     public Cell GetNeighbor(Direction direction)
     {
         switch (direction)
@@ -222,12 +288,4 @@ public class Cell
                 return Direction.Left;
         }
     }
-    private void Subscribe(Board parent)
-    {
-        EndSwapping = parent.EndSwapping;
-        EndCheckMatching = parent.CellEndCheckMeching;
-        parent._startCheckingMatch += CheckMatch;
-        parent._startMovingToEmptySpaces += StartMovementToEmptySpaces;
-    }
-
 }

@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,8 +18,9 @@ public class Board : MonoBehaviour
     private GameObject _cellPrefab;
 
     public event Action _startCheckingMatch;
-    public event Action _startMovingToEmptySpaces;
+
     private int _cellCount;
+    private bool _isNeedClearCrystals = false;
     void Start()
     {
 
@@ -30,18 +29,23 @@ public class Board : MonoBehaviour
 
     void InitializeBoard()
     {
+        //initialize cell array
         Cells = new Cell[_width, _height];
         for (int i = 0; i < _height; i++)
         {
             for (int j = 0; j < _width; j++)
             {
+                //instantiate cell prefab
                 GameObject cellObject = Instantiate(_cellPrefab, transform);
                 cellObject.GetComponent<VerticalLayoutGroup>().childControlHeight = true;
+                //Instantiate crystal
                 Crystal crystal = GenerateCrystalInCell(cellObject);
-                Cells[j, i] = new Cell(crystal, Gravity, cellObject,this);
+                //create cell instance
+                Cells[j, i] = new Cell(crystal, Gravity, cellObject, this);
             }
         }
 
+        //set neighbors for each cell
         for (int i = 0; i < _width; i++)
         {
             for (int j = 0; j < _height; j++)
@@ -51,24 +55,53 @@ public class Board : MonoBehaviour
         }
     }
 
+    //Works after swap is complete
     public void EndSwapping()
     {
-        _cellCount = _height * _width;
         StartCheckingMatch();
     }
     public void StartCheckingMatch()
     {
         Debug.Log("Start Cheking");
+        _cellCount = _height * _width;
         _startCheckingMatch?.Invoke();
     }
 
-    public void CellEndCheckMeching()
+    public void CellEndCheckMaching()
     {
         _cellCount--;
-            if (_cellCount == 0)
-            _startMovingToEmptySpaces?.Invoke();
+        if (_cellCount == 0)
+        {
+            ClearMustDestroyedCrystals();
+            CheckEmptySpaces();
+            if (_isNeedClearCrystals)
+                StartCheckingMatch();
+        }
     }
+    public void ClearMustDestroyedCrystals()
+    {
+        _isNeedClearCrystals = false;
+        for (int i = 0; i < _width; i++)
+        {
+            for (int j = 0; j < _height; j++)
+            {
+                bool result = Cells[i, j].ClearCrystal();
+                if (result)
+                    _isNeedClearCrystals = true;
+            }
+        }
+    }
+    public void CheckEmptySpaces()
+    {
+        for (int i = 0; i < _width; i++)
+        {
+            for (int j = _height - 1; j >= 0; j--)
+            {
 
+                Cells[i, j].TryMoveCrystalToEmptySpaces();
+            }
+        }
+    }
     private Neighbors FillNeighbors(int indexI, int indexJ)
     {
         Neighbors neighbors = new Neighbors();
@@ -77,12 +110,12 @@ public class Board : MonoBehaviour
 
         if (indexI > 0)
             neighbors._left_cell = Cells[indexI - 1, indexJ];
-        if(indexI + 1 < _width)
+        if (indexI + 1 < _width)
             neighbors._right_cell = Cells[indexI + 1, indexJ];
         if (indexJ > 0)
-            neighbors._top_cell = Cells[indexI, indexJ-1];
+            neighbors._top_cell = Cells[indexI, indexJ - 1];
         if (indexJ + 1 < _height)
-            neighbors._bottom_cell = Cells[indexI, indexJ+1];
+            neighbors._bottom_cell = Cells[indexI, indexJ + 1];
         return neighbors;
     }
 
@@ -102,7 +135,4 @@ public class Board : MonoBehaviour
         }
         return null;
     }
-
-
-
 }
