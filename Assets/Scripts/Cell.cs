@@ -54,6 +54,7 @@ public class Cell
     public bool IsEmpty { get; private set; } = false;
 
     public event Action EndSwapping;
+    public event Action EndCheckMatching;
     public Cell(Crystal crystal, Direction gravity, GameObject prefab, Board parent)
     {
         _prefab = prefab;
@@ -100,10 +101,15 @@ public class Cell
         return neighbor == null ? false : !neighbor.IsEmpty;
     }
 
+    private void StartMovementToEmptySpaces()
+    {
+        //Debug.Log("Start Movement To Empty Spaces");
+        MoveToEmptySpace(this);
+    }
     private void MoveToEmptySpace(Cell cell)
     {
         Cell neighbor = cell?.GetNeighbor(Gravity);
-        if (!neighbor.IsEmpty || neighbor == null)
+        if (neighbor == null || !neighbor.IsEmpty  )
             return;
         neighbor.Crystal = cell.Crystal;
         cell.Crystal = null;
@@ -115,21 +121,25 @@ public class Cell
         Cell neighbor = cell?.GetNeighbor(direction);
         if (neighbor == null || neighbor.Crystal == null || neighbor.Crystal.Type != cell.Crystal.Type)
         {
+            cell.Crystal.MustDestroy = true;
             cell.Crystal = null;
             return;
         }
-        neighbor.Crystal.MustDestroy = true;
         Debug.Log($"Match: {neighbor.Crystal.Type}");
         CheckNeighborsMatch(neighbor, direction);
-        cell.Crystal = null;
+        cell.Crystal.MustDestroy = true;
+        
     }
 
     public void CheckMatch()
     {
-        if (Crystal == null) { return; }
-        CheckMatchByDirection(Direction.Right);
-        if (Crystal == null) { return; }
-        CheckMatchByDirection(Direction.Top);
+        if (Crystal != null)
+            CheckMatchByDirection(Direction.Right);
+        if (Crystal != null)
+            CheckMatchByDirection(Direction.Top);
+        if(Crystal != null && Crystal.MustDestroy)
+            Crystal = null;
+        EndCheckMatching?.Invoke();
     }
 
     //################
@@ -215,7 +225,9 @@ public class Cell
     private void Subscribe(Board parent)
     {
         EndSwapping = parent.EndSwapping;
+        EndCheckMatching = parent.CellEndCheckMeching;
         parent._startCheckingMatch += CheckMatch;
+        parent._startMovingToEmptySpaces += StartMovementToEmptySpaces;
     }
 
 }
