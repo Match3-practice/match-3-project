@@ -242,12 +242,36 @@ public class Cell
         Cell neighbor = cell?.GetNeighbor(Gravity);
         if (neighbor == null || !neighbor.IsEmpty)
             return;
+        if (cell.Crystal != null)
+
+            DebugRay(cell);
+
         neighbor.Crystal = cell.Crystal;
         cell.Crystal = null;
         MoveToEmptySpace(neighbor);
     }
-    
-    
+
+    private void DebugRay(Cell cell)
+    {
+        switch (cell.Crystal.Type)
+        {
+            case Types.Red:
+                Debug.DrawRay(cell.Crystal.transform.position, Vector3.down * 100f, Color.red, 30f);
+
+                break;
+            case Types.Blue:
+                Debug.DrawRay(cell.Crystal.transform.position, Vector3.down * 100f, Color.blue, 30f);
+
+                break;
+            case Types.Green:
+                Debug.DrawRay(cell.Crystal.transform.position, Vector3.down * 100f, Color.green, 30f);
+
+                break;
+            default:
+                break;
+        }
+    }
+
     public bool ClearCrystal()
     {
         if (Crystal != null && Crystal.MustDestroy)
