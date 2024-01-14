@@ -30,6 +30,8 @@ public class Cell
     public event Action EndSwapping;
     public event Action EndCheckMatching;
 
+    private ICrystalAnimationService animationService;
+
     public Crystal Crystal
     {
         get => _crystal;
@@ -53,6 +55,8 @@ public class Cell
     /// <param name="parent">Parent board where the cell is located</param>
     public Cell(Crystal crystal, Direction gravity, GameObject prefab, Board parent)
     {
+        animationService = new DOTweenCrystalAnimService();
+
         _prefab = prefab;
         _crystal = crystal;
         _crystal.SubscribeIntercationAction(TrySwap);
@@ -248,7 +252,9 @@ public class Cell
     {
         if (Crystal != null && Crystal.MustDestroy)
         {
-            Crystal.Destroy();
+
+            animationService.AnimateDestroy(Crystal.gameObject, Crystal.Destroy);
+
             Crystal = null;
             return true;
         }

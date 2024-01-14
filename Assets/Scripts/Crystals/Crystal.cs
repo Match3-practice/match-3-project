@@ -4,6 +4,7 @@ using UnityEngine;
 public class Crystal : MonoBehaviour
 {
     private event Action<Direction> _interactAction;
+    private ICrystalAnimationService animationService = null;
     public Interaction _interactionSystem;
     public Vector2 Position { get => transform.localPosition; }
     public Types Type { get; set; }
@@ -13,6 +14,8 @@ public class Crystal : MonoBehaviour
     {
         _interactionSystem = gameObject.AddComponent<Interaction>();        
         _interactionSystem.SwapAction += OnInteract;
+
+        animationService = new DOTweenCrystalAnimService();
     }
 
     public void OnInteract(Direction direction)
@@ -24,6 +27,10 @@ public class Crystal : MonoBehaviour
     public void ChangePositionInBoard(Cell newCell)
     {
         gameObject.transform.SetParent(newCell.Position);
+
+        if(gameObject != null && newCell != null)
+        animationService.AnimatePosition(gameObject, newCell.Position.position);
+
         UnsubscribeAll();
         SubscribeIntercationAction(newCell.TrySwap);
     }
