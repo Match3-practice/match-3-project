@@ -37,7 +37,6 @@ public class Board : MonoBehaviour
             {
                 //instantiate cell prefab
                 GameObject cellObject = Instantiate(_cellPrefab, transform);
-                cellObject.GetComponent<VerticalLayoutGroup>().childControlHeight = true;
                 //Instantiate crystal
                 Crystal crystal = GenerateCrystalInCell(cellObject);
                 //create cell instance

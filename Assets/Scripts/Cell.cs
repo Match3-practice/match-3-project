@@ -277,7 +277,7 @@ public class Cell
         if (Crystal != null && Crystal.MustDestroy)
         {
 
-            animationService.AnimateDestroy(Crystal.gameObject, Crystal.Destroy);
+            animationService.AnimateDestroy(Crystal.gameObject, Crystal.Destroy,1f);
 
             Crystal = null;
             return true;
