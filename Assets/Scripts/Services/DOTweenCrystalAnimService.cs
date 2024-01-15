@@ -4,9 +4,18 @@ using UnityEngine;
 
 public class DOTweenCrystalAnimService : ICrystalAnimationService
 {
+    private Tween tween = null;
+
     public void AnimatePosition(GameObject crystal, Vector3 targetPos, float speed = 1)
     {
-        crystal.transform.DOMove(targetPos, speed);
+        if (tween != null)
+        {
+            tween.Kill();
+            tween = null;
+        }
+
+        tween = crystal.transform.DOMove(targetPos, speed);
+
     }
 
     public void AnimatePosition(GameObject crystal, Transform targetTransform, float speed = 1)
