@@ -4,17 +4,20 @@ using UnityEngine;
 
 public class DOTweenCrystalAnimService : ICrystalAnimationService
 {
-    private Tween tween = null;
+    public Tween Tween {get; set;}  
 
-    public void AnimatePosition(GameObject crystal, Vector3 targetPos, float speed = 1)
+    public void AnimatePosition(GameObject crystal, Vector3 targetPos, float speed = 1f)
     {
-        if (tween != null)
+        if (Tween != null)
         {
-            tween.Kill();
-            tween = null;
+            Tween.Kill();
+            Tween = null;
         }
 
-        tween = crystal.transform.DOMove(targetPos, speed);
+        Tween = crystal.transform.DOMove(targetPos, speed);
+
+        Sequence sequence = DOTween.Sequence();
+
 
     }
 
@@ -28,5 +31,10 @@ public class DOTweenCrystalAnimService : ICrystalAnimationService
         crystal.transform.DOLocalMove(new Vector3(0, -5000f, 0), duration).SetEase(Ease.InBack).OnComplete(()=> action());
         else
         crystal.transform.DOLocalMove(new Vector3(0, -5000f, 0), duration).SetEase(Ease.InBack);
+    }
+
+    public Tween GetTween(string name)
+    {
+        throw new NotImplementedException();
     }
 }

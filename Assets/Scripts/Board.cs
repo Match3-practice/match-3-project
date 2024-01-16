@@ -1,26 +1,25 @@
 using System;
 
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Board : MonoBehaviour
 {
-    private Cell[,] Cells;
-    [SerializeField]
-    private int _width = 5;
-    [SerializeField]
-    private int _height = 5;
-    public Direction Gravity;
+    [SerializeField] private CrystalData[] _setOfCrystals;
 
-    [SerializeField]
-    private CrystalData[] _setOfCrystals;
-    [SerializeField]
-    private GameObject _cellPrefab;
+    [SerializeField] private GameObject _cellPrefab;
+
+    [SerializeField] private int _width = 5;
+    [SerializeField] private int _height = 5;
 
     public event Action _startCheckingMatch;
 
+    public Direction Gravity;
+
+    private MonoCell[] Cells;
+
     private int _cellCount;
     private bool _isNeedClearCrystals = false;
+
     void Start()
     {
 
@@ -29,34 +28,23 @@ public class Board : MonoBehaviour
 
     void InitializeBoard()
     {
-        //initialize cell array
-        Cells = new Cell[_width, _height];
-        for (int i = 0; i < _height; i++)
-        {
-            for (int j = 0; j < _width; j++)
-            {
-                //instantiate cell prefab
-                GameObject cellObject = Instantiate(_cellPrefab, transform);
-                //Instantiate crystal
-                Crystal crystal = GenerateCrystalInCell(cellObject);
-                //create cell instance
-                Cells[j, i] = new Cell(crystal, Gravity, cellObject, this);
-            }
-        }
 
-        //set neighbors for each cell
-        for (int i = 0; i < _width; i++)
+        Cells = gameObject.GetComponentsInChildren<MonoCell>();
+
+        for (int i = 0; i < _height * _width; i++)
         {
-            for (int j = 0; j < _height; j++)
-            {
-                Cells[i, j].SetNeighbors(FillNeighbors(i, j));
-            }
+            Crystal crystal = GenerateCrystalInCell(Cells[i].gameObject);
+
+            Cells[i].InitialzeCell(crystal, Gravity, this);
+
+            Cells[i].SetNeighbors(FillNeighbors(i));
         }
     }
 
     //Works after swap is complete
     public void EndSwapping()
     {
+
         StartCheckingMatch();
     }
     public void StartCheckingMatch()
@@ -80,41 +68,39 @@ public class Board : MonoBehaviour
     public void ClearMustDestroyedCrystals()
     {
         _isNeedClearCrystals = false;
-        for (int i = 0; i < _width; i++)
+        for (int i = 0; i < _height * _width ; i++)
         {
-            for (int j = 0; j < _height; j++)
-            {
-                bool result = Cells[i, j].ClearCrystal();
-                if (result)
-                    _isNeedClearCrystals = true;
-            }
+
+            bool result = Cells[i].ClearCrystal();
+            if (result)
+                _isNeedClearCrystals = true;
         }
     }
     public void CheckEmptySpaces()
     {
-        for (int i = 0; i < _width; i++)
+        for (int i = 0; i < _height * _width; i++)
         {
-            for (int j = _height - 1; j >= 0; j--)
-            {
-
-                Cells[i, j].TryMoveCrystalToEmptySpaces();
-            }
+            Cells[i].TryMoveCrystalToEmptySpaces();
         }
     }
-    private Neighbors FillNeighbors(int indexI, int indexJ)
+    private Neighbors FillNeighbors(int index)
     {
+
         Neighbors neighbors = new Neighbors();
+
+
         if (Cells == null)
             return neighbors;
 
-        if (indexI > 0)
-            neighbors._left_cell = Cells[indexI - 1, indexJ];
-        if (indexI + 1 < _width)
-            neighbors._right_cell = Cells[indexI + 1, indexJ];
-        if (indexJ > 0)
-            neighbors._top_cell = Cells[indexI, indexJ - 1];
-        if (indexJ + 1 < _height)
-            neighbors._bottom_cell = Cells[indexI, indexJ + 1];
+        if (index % _width != 0)
+            neighbors._left_cell = Cells[index - 1];
+        if (index % _width != _width - 1)
+            neighbors._right_cell = Cells[index + 1];
+
+        if (index >= _width)
+            neighbors._top_cell = Cells[index - _width];
+        if (index < Cells.Length - _width)
+            neighbors._bottom_cell = Cells[index + _width];
         return neighbors;
     }
 

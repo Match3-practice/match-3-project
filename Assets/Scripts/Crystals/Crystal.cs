@@ -4,7 +4,7 @@ using UnityEngine;
 public class Crystal : MonoBehaviour
 {
     private event Action<Direction> _interactAction;
-    private ICrystalAnimationService animationService = null;
+    public ICrystalAnimationService animationService = null;
     public Interaction _interactionSystem;
     public Vector2 Position { get => transform.localPosition; }
     public Types Type { get; set; }
@@ -24,20 +24,20 @@ public class Crystal : MonoBehaviour
             _interactAction?.Invoke(direction);
     }
 
-    public void ChangePositionInBoard(Cell newCell)
+    public void ChangePositionInBoard(MonoCell newCell)
     {
         gameObject.transform.SetParent(newCell.Position);
 
         if(gameObject != null && newCell != null)
-        animationService.AnimatePosition(gameObject, newCell.Position.position);
+        animationService.AnimatePosition(gameObject, newCell.Position.position, 5f);
 
         UnsubscribeAll();
         SubscribeIntercationAction(newCell.TrySwap);
     }
-    public void ChangePosition(Vector3 newPosition)
-    {
-        transform.localPosition = newPosition;
-    }
+    //public void ChangePosition(Vector3 newPosition)
+    //{
+    //    transform.localPosition = newPosition;
+    //}
     public void UnsubscribeAll()
     {
         _interactAction = null;

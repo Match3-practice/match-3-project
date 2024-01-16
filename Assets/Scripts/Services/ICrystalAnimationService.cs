@@ -1,8 +1,13 @@
-﻿using System;
+﻿using DG.Tweening;
+using System;
 using UnityEngine;
 
 public interface ICrystalAnimationService
 {
+    public Tween Tween { get; set; }
+
+    public Tween GetTween(string name);
+
     ///<summary>
     ///Animate crystal movement from current to target position
     ///</summary>
