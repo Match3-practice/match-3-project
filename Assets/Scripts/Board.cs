@@ -22,13 +22,11 @@ public class Board : MonoBehaviour
 
     void Start()
     {
-
         InitializeBoard();
     }
 
     void InitializeBoard()
     {
-
         Cells = gameObject.GetComponentsInChildren<MonoCell>();
 
         for (int i = 0; i < _height * _width; i++)
@@ -44,7 +42,7 @@ public class Board : MonoBehaviour
     //Works after swap is complete
     public void EndSwapping()
     {
-
+        StopAllCoroutines();
         StartCheckingMatch();
     }
     public void StartCheckingMatch()

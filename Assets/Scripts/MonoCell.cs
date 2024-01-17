@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class MonoCell : MonoBehaviour
@@ -107,7 +108,9 @@ public class MonoCell : MonoBehaviour
         {
             Crystal.MustDestroy = true;
         }
-        EndCheckMatching?.Invoke();
+
+        StartCoroutine(WaitUntilAnimEnd());
+
     }
 
     private void CheckMatchByDirection(Direction direction, Direction directionReverse)
@@ -124,11 +127,11 @@ public class MonoCell : MonoBehaviour
         }
     }
 
-    //IEnumerator WaitUntilAnimEnd()
-    //{
-    //    yield return new WaitUntil(() => Crystal.animationService.Tween == null);
-
-    //}
+    IEnumerator WaitUntilAnimEnd()
+    {
+        yield return new WaitUntil(() => Crystal.animationService.Tween == null);
+        EndSwapping?.Invoke();
+    }
 
     private bool HasNeighborSameTypeCrystal(Direction direction)
     {
@@ -168,7 +171,7 @@ public class MonoCell : MonoBehaviour
         if (cell.Crystal != null)
 
             Debug.Log(neighbor.gameObject.name);
-            Debug.Log(cell.gameObject.name);
+        Debug.Log(cell.gameObject.name);
 
 
         DebugRay(cell);
