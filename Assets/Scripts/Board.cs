@@ -20,12 +20,12 @@ public class Board : MonoBehaviour
     private int _cellCount;
     private bool _isNeedClearCrystals = false;
 
-    void Start()
+    private void Start()
     {
         InitializeBoard();
     }
 
-    void InitializeBoard()
+    private void InitializeBoard()
     {
         Cells = gameObject.GetComponentsInChildren<MonoCell>();
 
@@ -42,7 +42,13 @@ public class Board : MonoBehaviour
     //Works after swap is complete
     public void EndSwapping()
     {
-        StopAllCoroutines();
+        #region Debug
+
+        Debug.Log($" CheckMatch count: {MonoCell._counter}");
+
+        #endregion
+
+
         StartCheckingMatch();
     }
     public void StartCheckingMatch()
@@ -66,7 +72,7 @@ public class Board : MonoBehaviour
     public void ClearMustDestroyedCrystals()
     {
         _isNeedClearCrystals = false;
-        for (int i = 0; i < _height * _width ; i++)
+        for (int i = 0; i < _height * _width; i++)
         {
 
             bool result = Cells[i].ClearCrystal();

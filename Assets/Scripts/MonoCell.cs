@@ -14,6 +14,11 @@ public class MonoCell : MonoBehaviour
     public event Action EndSwapping;
     public event Action EndCheckMatching;
 
+    #region Debug
+
+    public static int _counter = 0;
+
+    #endregion
 
     public Crystal Crystal
     {
@@ -29,51 +34,6 @@ public class MonoCell : MonoBehaviour
                 IsEmpty = false;
             }
         }
-    }
-
-
-    public void InitialzeCell(Crystal crystal, Direction gravity, Board parent)
-    {
-        _crystal = crystal;
-        _crystal.SubscribeIntercationAction(TrySwap);
-        Gravity = gravity;
-        Subscribe(parent);
-    }
-
-    private void Subscribe(Board parent)
-    {
-        EndSwapping = parent.EndSwapping;
-        EndCheckMatching = parent.CellEndCheckMaching;
-        parent._startCheckingMatch += CheckMatch;
-    }
-
-    public void TrySwap(Direction direction)
-    {
-        if (!CanSwap(direction))
-        {
-            Debug.Log($"Can't swap: direction {direction}");
-            return;
-        }
-        Debug.Log($"Swap: direction {direction}");
-        MonoCell neighbor = GetNeighbor(direction);
-        if (neighbor == null)
-            Debug.LogError($"The neighbor doesn't exist. Direction: {direction}");
-        SwapWithNeighbor(neighbor);
-    }
-
-    private bool CanSwap(Direction direction)
-    {
-        MonoCell neighbor = GetNeighbor(direction);
-        return neighbor == null ? false : !neighbor.IsEmpty;
-    }
-
-    private void SwapWithNeighbor(MonoCell neighbor)
-    {
-        Crystal temporary = neighbor.Crystal;
-        neighbor.Crystal = Crystal;
-        Crystal = temporary;
-
-        EndSwapping?.Invoke();
     }
 
     public MonoCell GetNeighbor(Direction direction)
@@ -93,12 +53,56 @@ public class MonoCell : MonoBehaviour
         }
     }
 
+    public bool ClearCrystal()
+    {
+        if (Crystal != null && Crystal.MustDestroy)
+        {
+            //if (Crystal.animationService.Tween != null)
+            //    Crystal.animationService.Tween.onComplete += DestroyHandler;
+            //else
+            Crystal.animationService.AnimateDestroy(Crystal.gameObject, Crystal.Destroy, 5f);
+
+
+            Crystal = null;
+            return true;
+        }
+        return false;
+    }
+
+    public void InitialzeCell(Crystal crystal, Direction gravity, Board parent)
+    {
+        _crystal = crystal;
+        _crystal.SubscribeIntercationAction(TrySwap);
+        Gravity = gravity;
+        Subscribe(parent);
+    }
+
+    public void TryMoveCrystalToEmptySpaces()
+    {
+        if (Crystal != null)
+            MoveToEmptySpace(this);
+    }
+
+    public void TrySwap(Direction direction)
+    {
+        if (!CanSwap(direction))
+        {
+            Debug.Log($"Can't swap: direction {direction}");
+            return;
+        }
+        Debug.Log($"Swap: direction {direction}");
+        MonoCell neighbor = GetNeighbor(direction);
+        if (neighbor == null)
+            Debug.LogError($"The neighbor doesn't exist. Direction: {direction}");
+        SwapWithNeighbor(neighbor);
+    }
+
     public void SetNeighbors(Neighbors neighbors)
     {
         _neighbors = neighbors;
     }
 
-    public void CheckMatch()
+    private void CheckMatch()
     {
         if (Crystal != null)
             CheckMatchByDirection(Direction.Right, GetReverseDirection(Direction.Right));
@@ -109,8 +113,13 @@ public class MonoCell : MonoBehaviour
             Crystal.MustDestroy = true;
         }
 
-        StartCoroutine(WaitUntilAnimEnd());
+        #region Debug
 
+        _counter++;
+
+        #endregion
+
+        EndSwapping?.Invoke();
     }
 
     private void CheckMatchByDirection(Direction direction, Direction directionReverse)
@@ -127,22 +136,6 @@ public class MonoCell : MonoBehaviour
         }
     }
 
-    IEnumerator WaitUntilAnimEnd()
-    {
-        yield return new WaitUntil(() => Crystal.animationService.Tween == null);
-        EndSwapping?.Invoke();
-    }
-
-    private bool HasNeighborSameTypeCrystal(Direction direction)
-    {
-        MonoCell neighbor = GetNeighbor(direction);
-        if (neighbor == null || neighbor.Crystal == null)
-            return false;
-        if (neighbor.Crystal.Type != Crystal.Type)
-            return false;
-        return true;
-    }
-
     private void CheckNeighborsMatch(MonoCell cell, Direction direction)
     {
         MonoCell neighbor = cell?.GetNeighbor(direction);
@@ -155,12 +148,6 @@ public class MonoCell : MonoBehaviour
         Debug.Log($"Match: {neighbor.Crystal.Type}");
         CheckNeighborsMatch(neighbor, direction);
         cell.Crystal.MustDestroy = true;
-    }
-
-    public void TryMoveCrystalToEmptySpaces()
-    {
-        if (Crystal != null)
-            MoveToEmptySpace(this);
     }
 
     private void MoveToEmptySpace(MonoCell cell)
@@ -202,25 +189,41 @@ public class MonoCell : MonoBehaviour
         }
     }
 
-    public bool ClearCrystal()
+    //private void DestroyHandler()
+    //{
+    //    Crystal.animationService.AnimateDestroy(Crystal.gameObject, Crystal.Destroy, 5f);
+    //}
+
+    private void Subscribe(Board parent)
     {
-        if (Crystal != null && Crystal.MustDestroy)
-        {
-            //if (Crystal.animationService.Tween != null)
-            //    Crystal.animationService.Tween.onComplete += DestroyHandler;
-            //else
-            Crystal.animationService.AnimateDestroy(Crystal.gameObject, Crystal.Destroy, 5f);
-
-
-            Crystal = null;
-            return true;
-        }
-        return false;
+        EndSwapping = parent.EndSwapping;
+        EndCheckMatching = parent.CellEndCheckMaching;
+        parent._startCheckingMatch += CheckMatch;
     }
 
-    private void DestroyHandler()
+    private void SwapWithNeighbor(MonoCell neighbor)
     {
-        Crystal.animationService.AnimateDestroy(Crystal.gameObject, Crystal.Destroy, 5f);
+        Crystal temporary = neighbor.Crystal;
+        neighbor.Crystal = Crystal;
+        Crystal = temporary;
+
+        EndSwapping?.Invoke();
+    }
+
+    private bool CanSwap(Direction direction)
+    {
+        MonoCell neighbor = GetNeighbor(direction);
+        return neighbor == null ? false : !neighbor.IsEmpty;
+    }
+
+    private bool HasNeighborSameTypeCrystal(Direction direction)
+    {
+        MonoCell neighbor = GetNeighbor(direction);
+        if (neighbor == null || neighbor.Crystal == null)
+            return false;
+        if (neighbor.Crystal.Type != Crystal.Type)
+            return false;
+        return true;
     }
 
     private Direction GetReverseDirection(Direction direction)
@@ -239,4 +242,10 @@ public class MonoCell : MonoBehaviour
                 return Direction.Left;
         }
     }
+
+    //private IEnumerator WaitUntilAnimEnd()
+    //{
+    //    yield return new WaitUntil(() => Crystal.animationService.Tween == null);
+    //}
+
 }
