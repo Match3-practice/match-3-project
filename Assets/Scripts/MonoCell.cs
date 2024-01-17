@@ -60,7 +60,7 @@ public class MonoCell : MonoBehaviour
             //if (Crystal.animationService.Tween != null)
             //    Crystal.animationService.Tween.onComplete += DestroyHandler;
             //else
-            Crystal.animationService.AnimateDestroy(Crystal.gameObject, Crystal.Destroy, 5f);
+            Crystal.animationService.AnimateDestroy(Crystal.gameObject, Crystal.Destroy, 1f);
 
 
             Crystal = null;
@@ -80,7 +80,9 @@ public class MonoCell : MonoBehaviour
     public void TryMoveCrystalToEmptySpaces()
     {
         if (Crystal != null)
+        {
             MoveToEmptySpace(this);
+        }
     }
 
     public void TrySwap(Direction direction)
@@ -153,7 +155,9 @@ public class MonoCell : MonoBehaviour
     {
         MonoCell neighbor = cell?.GetNeighbor(Gravity);
         if (neighbor == null || !neighbor.IsEmpty)
+        {
             return;
+        }
         if (cell.Crystal != null)
 
             Debug.Log(neighbor.gameObject.name);
@@ -161,7 +165,6 @@ public class MonoCell : MonoBehaviour
 
 
         DebugRay(cell);
-
         neighbor.Crystal = cell.Crystal;
         cell.Crystal = null;
         MoveToEmptySpace(neighbor);

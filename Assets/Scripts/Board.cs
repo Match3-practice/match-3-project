@@ -49,7 +49,8 @@ public class Board : MonoBehaviour
 
         #endregion
 
-        StartCoroutine(WaitUntilAnimEndSwap());
+        DOTweenCrystalAnimService.EndAnimations();
+        StartCheckingMatch();
         //StartCheckingMatch();
 
     }
@@ -67,8 +68,11 @@ public class Board : MonoBehaviour
         if (_cellCount == 0)
         {
             ClearMustDestroyedCrystals();
-
-            StartCoroutine(WaitUntilAnimEndMatch());
+            DOTweenCrystalAnimService.EndAnimations();
+            CheckEmptySpaces();
+            DOTweenCrystalAnimService.EndAnimations();
+            if (_isNeedClearCrystals)
+                StartCheckingMatch();
         }
     }
     public void ClearMustDestroyedCrystals()
@@ -84,7 +88,7 @@ public class Board : MonoBehaviour
     }
     public void CheckEmptySpaces()
     {
-        for (int i = 0; i < _height * _width; i++)
+        for (int i = _height * _width-1; i >= 0 ; i--)
         {
             Cells[i].TryMoveCrystalToEmptySpaces();
         }
@@ -125,32 +129,6 @@ public class Board : MonoBehaviour
             Debug.LogError("The set of crystals is not filled. Check the field \"Set Of Crystals\"");
         }
         return null;
-    }
-    private IEnumerator WaitUntilAnimEndSwap()
-    {
-        DOTweenCrystalAnimService.PlayAnimation();
-        Debug.Log("End Swap" + DOTweenCrystalAnimService.sequence.Duration());
-        yield return new WaitForSeconds(DOTweenCrystalAnimService.sequence.Duration());
-        StartCheckingMatch();
-    }
-    private IEnumerator WaitUntilAnimEndMatch()
-    {
-        DOTweenCrystalAnimService.PlayAnimation();
-        Debug.Log("End Match"+DOTweenCrystalAnimService.sequence.Duration());
-        yield return new WaitForSeconds(DOTweenCrystalAnimService.sequence.Duration());
-
-        CheckEmptySpaces();
-        StartCoroutine(WaitUntilAnimEndEmptySpace());
-    }
-
-    private IEnumerator WaitUntilAnimEndEmptySpace()
-    {
-        DOTweenCrystalAnimService.PlayAnimation();
-        Debug.Log("End Empty" + DOTweenCrystalAnimService.sequence.Duration());
-        yield return new WaitForSeconds(DOTweenCrystalAnimService.sequence.Duration());
-
-        if (_isNeedClearCrystals)
-            StartCheckingMatch();
     }
 
 

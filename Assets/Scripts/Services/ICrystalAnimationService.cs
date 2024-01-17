@@ -31,7 +31,7 @@ public interface ICrystalAnimationService
     /// </remarks>
     ///<param name="speed">Animation duration. Default => 1f </param>
 
-    void AnimatePosition(GameObject crystal, Vector3 targetPos, float speed = 1f);
+    //void AnimatePosition(GameObject crystal, Vector3 targetPos, float speed = 1f);
 
     ///<summary>
     ///Animate crystal movement from current to target position
@@ -82,7 +82,7 @@ public interface ICrystalAnimationService
     /// <param name="action">Optional action after animation end. You can connect your action to animation thread here. Default  = null </param>
 
 
-    void AnimateDestroy(GameObject crystal, Action action = null, float duration = 5f);
+    void AnimateDestroy(GameObject crystal, Action action = null, float duration = 1f);
 
     //void AnimateRotation();
 

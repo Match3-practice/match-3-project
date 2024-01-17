@@ -29,7 +29,7 @@ public class Crystal : MonoBehaviour
         gameObject.transform.SetParent(newCell.Position);
 
         if(gameObject != null && newCell != null)
-            animationService.AnimatePosition(gameObject, newCell.Position.position, 5f);
+            animationService.AnimatePosition(gameObject, newCell.transform, 1f);
 
         UnsubscribeAll();
         SubscribeIntercationAction(newCell.TrySwap);
