@@ -86,5 +86,7 @@ public interface ICrystalAnimationService
 
     //void AnimateRotation();
 
-
+    //##############
+    //void AddAnimationToSequence(GameObject crystal, Vector3 targetPos, float speed = 1f);
+    
 }

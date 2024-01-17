@@ -118,8 +118,7 @@ public class MonoCell : MonoBehaviour
         _counter++;
 
         #endregion
-
-        EndSwapping?.Invoke();
+        EndCheckMatching?.Invoke();
     }
 
     private void CheckMatchByDirection(Direction direction, Direction directionReverse)
@@ -206,6 +205,7 @@ public class MonoCell : MonoBehaviour
         Crystal temporary = neighbor.Crystal;
         neighbor.Crystal = Crystal;
         Crystal = temporary;
+
 
         EndSwapping?.Invoke();
     }

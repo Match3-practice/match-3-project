@@ -1,5 +1,6 @@
+using DG.Tweening;
 using System;
-
+using System.Collections;
 using UnityEngine;
 
 public class Board : MonoBehaviour
@@ -48,9 +49,11 @@ public class Board : MonoBehaviour
 
         #endregion
 
+        StartCoroutine(WaitUntilAnimEndSwap());
+        //StartCheckingMatch();
 
-        StartCheckingMatch();
     }
+
     public void StartCheckingMatch()
     {
         Debug.Log("Start Cheking");
@@ -64,9 +67,8 @@ public class Board : MonoBehaviour
         if (_cellCount == 0)
         {
             ClearMustDestroyedCrystals();
-            CheckEmptySpaces();
-            if (_isNeedClearCrystals)
-                StartCheckingMatch();
+
+            StartCoroutine(WaitUntilAnimEndMatch());
         }
     }
     public void ClearMustDestroyedCrystals()
@@ -124,4 +126,35 @@ public class Board : MonoBehaviour
         }
         return null;
     }
+    private IEnumerator WaitUntilAnimEndSwap()
+    {
+        DOTweenCrystalAnimService.PlayAnimation();
+        Debug.Log("End Swap" + DOTweenCrystalAnimService.sequence.Duration());
+        yield return new WaitForSeconds(DOTweenCrystalAnimService.sequence.Duration());
+        StartCheckingMatch();
+    }
+    private IEnumerator WaitUntilAnimEndMatch()
+    {
+        DOTweenCrystalAnimService.PlayAnimation();
+        Debug.Log("End Match"+DOTweenCrystalAnimService.sequence.Duration());
+        yield return new WaitForSeconds(DOTweenCrystalAnimService.sequence.Duration());
+
+        CheckEmptySpaces();
+        StartCoroutine(WaitUntilAnimEndEmptySpace());
+    }
+
+    private IEnumerator WaitUntilAnimEndEmptySpace()
+    {
+        DOTweenCrystalAnimService.PlayAnimation();
+        Debug.Log("End Empty" + DOTweenCrystalAnimService.sequence.Duration());
+        yield return new WaitForSeconds(DOTweenCrystalAnimService.sequence.Duration());
+
+        if (_isNeedClearCrystals)
+            StartCheckingMatch();
+    }
+
+
+
+
+    
 }
