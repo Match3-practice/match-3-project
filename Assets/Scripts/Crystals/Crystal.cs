@@ -1,20 +1,52 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
-public class Crystal : Movement
+public class Crystal : MonoBehaviour
 {
-    public event Action<Direction> Move;
+    private event Action<Direction> _interactAction;
+    public Interaction _interactionSystem;
+    public Vector2 Position { get => transform.localPosition; }
+    public Types Type { get; set; }
 
+    public bool MustDestroy { get; set; } = false;
     private void Start()
     {
-        SwapAction += OnMove;
+        _interactionSystem = gameObject.AddComponent<Interaction>();        
+        _interactionSystem.SwapAction += OnInteract;
+
     }
 
-    public void OnMove(Direction direction)
+    public void OnInteract(Direction direction)
     {
-        Move?.Invoke(direction);
+        if (direction != Direction.None) 
+            _interactAction?.Invoke(direction);
+    }
+
+    public void ChangePositionInBoard(Cell newCell)
+    {
+        gameObject.transform.SetParent(newCell.Position);
+
+        if(gameObject != null && newCell != null)
+            DOTweenCrystalAnimService.AnimatePosition(gameObject, newCell.transform, 0.5f);
+
+        UnsubscribeAll();
+        SubscribeIntercationAction(newCell.TrySwap);
+    }
+    //public void ChangePosition(Vector3 newPosition)
+    //{
+    //    transform.localPosition = newPosition;
+    //}
+    public void UnsubscribeAll()
+    {
+        _interactAction = null;
+    }
+    public void SubscribeIntercationAction(Action<Direction> action)
+    {
+        _interactAction += action;
+    }
+
+    public void Destroy()
+    {
+        Destroy(gameObject);
     }
 }

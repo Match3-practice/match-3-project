@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Blue Crystal
   m_EditorClassIdentifier: 
   Prefab: {fileID: 4786402657035695583, guid: d6c6a690b71b6284da501dbbdee08438, type: 3}
-  Type: 0
+  Type: 1
