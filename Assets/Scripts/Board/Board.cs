@@ -16,7 +16,7 @@ public class Board : MonoBehaviour
 
     public Direction Gravity;
 
-    private MonoCell[] Cells;
+    private Cell[] Cells;
 
     private int _cellCount;
     private bool _isNeedClearCrystals = false;
@@ -28,7 +28,7 @@ public class Board : MonoBehaviour
 
     private void InitializeBoard()
     {
-        Cells = gameObject.GetComponentsInChildren<MonoCell>();
+        Cells = gameObject.GetComponentsInChildren<Cell>();
 
         for (int i = 0; i < _height * _width; i++)
         {

@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class MonoCell : MonoBehaviour
+public class Cell : MonoBehaviour
 {
     [HideInInspector] public Direction Gravity;
 
@@ -30,7 +30,7 @@ public class MonoCell : MonoBehaviour
         }
     }
 
-    public MonoCell GetNeighbor(Direction direction)
+    public Cell GetNeighbor(Direction direction)
     {
         switch (direction)
         {
@@ -83,7 +83,7 @@ public class MonoCell : MonoBehaviour
             return;
         }
         Debug.Log($"Swap: direction {direction}");
-        MonoCell neighbor = GetNeighbor(direction);
+        Cell neighbor = GetNeighbor(direction);
         if (neighbor == null)
             Debug.LogError($"The neighbor doesn't exist. Direction: {direction}");
         SwapWithNeighbor(neighbor);
@@ -112,8 +112,8 @@ public class MonoCell : MonoBehaviour
     {
         if (HasNeighborSameTypeCrystal(direction) && HasNeighborSameTypeCrystal(directionReverse))
         {
-            MonoCell neighborForward = GetNeighbor(direction);
-            MonoCell neighborBackward = GetNeighbor(directionReverse);
+            Cell neighborForward = GetNeighbor(direction);
+            Cell neighborBackward = GetNeighbor(directionReverse);
 
             Debug.Log($"Match: {Crystal.Type}");
             CheckNeighborsMatch(neighborForward, direction);
@@ -122,9 +122,9 @@ public class MonoCell : MonoBehaviour
         }
     }
 
-    private void CheckNeighborsMatch(MonoCell cell, Direction direction)
+    private void CheckNeighborsMatch(Cell cell, Direction direction)
     {
-        MonoCell neighbor = cell?.GetNeighbor(direction);
+        Cell neighbor = cell?.GetNeighbor(direction);
         //until the neighboring crystal is of a different type
         if (neighbor == null || neighbor.Crystal == null || neighbor.Crystal.Type != cell.Crystal.Type)
         {
@@ -136,9 +136,9 @@ public class MonoCell : MonoBehaviour
         cell.Crystal.MustDestroy = true;
     }
 
-    private void MoveToEmptySpace(MonoCell cell)
+    private void MoveToEmptySpace(Cell cell)
     {
-        MonoCell neighbor = cell?.GetNeighbor(Gravity);
+        Cell neighbor = cell?.GetNeighbor(Gravity);
         if (neighbor == null || !neighbor.IsEmpty)
         {
             return;
@@ -155,7 +155,7 @@ public class MonoCell : MonoBehaviour
         MoveToEmptySpace(neighbor);
     }
 
-    private void DebugRay(MonoCell cell)
+    private void DebugRay(Cell cell)
     {
         switch (cell.Crystal.Type)
         {
@@ -183,7 +183,7 @@ public class MonoCell : MonoBehaviour
         parent._startCheckingMatch += CheckMatch;
     }
 
-    private void SwapWithNeighbor(MonoCell neighbor)
+    private void SwapWithNeighbor(Cell neighbor)
     {
         Crystal temporary = neighbor.Crystal;
         neighbor.Crystal = Crystal;
@@ -195,13 +195,13 @@ public class MonoCell : MonoBehaviour
 
     private bool CanSwap(Direction direction)
     {
-        MonoCell neighbor = GetNeighbor(direction);
+        Cell neighbor = GetNeighbor(direction);
         return neighbor == null ? false : !neighbor.IsEmpty;
     }
 
     private bool HasNeighborSameTypeCrystal(Direction direction)
     {
-        MonoCell neighbor = GetNeighbor(direction);
+        Cell neighbor = GetNeighbor(direction);
         if (neighbor == null || neighbor.Crystal == null)
             return false;
         if (neighbor.Crystal.Type != Crystal.Type)

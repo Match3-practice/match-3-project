@@ -22,7 +22,7 @@ public class Crystal : MonoBehaviour
             _interactAction?.Invoke(direction);
     }
 
-    public void ChangePositionInBoard(MonoCell newCell)
+    public void ChangePositionInBoard(Cell newCell)
     {
         gameObject.transform.SetParent(newCell.Position);
 
