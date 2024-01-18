@@ -51,7 +51,7 @@ public class MonoCell : MonoBehaviour
     {
         if (Crystal != null && Crystal.MustDestroy)
         {
-            DOTweenCrystalAnimService.AnimateDestroy(Crystal.gameObject, Crystal.Destroy, 1f);
+            DOTweenCrystalAnimService.AnimateDestroy(Crystal.gameObject, Crystal.Destroy, 0.8f);
 
             Crystal = null;
             return true;

@@ -27,7 +27,7 @@ public class Crystal : MonoBehaviour
         gameObject.transform.SetParent(newCell.Position);
 
         if(gameObject != null && newCell != null)
-            DOTweenCrystalAnimService.AnimatePosition(gameObject, newCell.transform, 1f);
+            DOTweenCrystalAnimService.AnimatePosition(gameObject, newCell.transform, 0.5f);
 
         UnsubscribeAll();
         SubscribeIntercationAction(newCell.TrySwap);
