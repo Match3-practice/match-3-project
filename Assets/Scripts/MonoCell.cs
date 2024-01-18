@@ -14,12 +14,6 @@ public class MonoCell : MonoBehaviour
     public event Action EndSwapping;
     public event Action EndCheckMatching;
 
-    #region Debug
-
-    public static int _counter = 0;
-
-    #endregion
-
     public Crystal Crystal
     {
         get => _crystal;
@@ -57,11 +51,7 @@ public class MonoCell : MonoBehaviour
     {
         if (Crystal != null && Crystal.MustDestroy)
         {
-            //if (Crystal.animationService.Tween != null)
-            //    Crystal.animationService.Tween.onComplete += DestroyHandler;
-            //else
-            Crystal.animationService.AnimateDestroy(Crystal.gameObject, Crystal.Destroy, 1f);
-
+            DOTweenCrystalAnimService.AnimateDestroy(Crystal.gameObject, Crystal.Destroy, 1f);
 
             Crystal = null;
             return true;
@@ -115,11 +105,6 @@ public class MonoCell : MonoBehaviour
             Crystal.MustDestroy = true;
         }
 
-        #region Debug
-
-        _counter++;
-
-        #endregion
         EndCheckMatching?.Invoke();
     }
 
@@ -191,11 +176,6 @@ public class MonoCell : MonoBehaviour
         }
     }
 
-    //private void DestroyHandler()
-    //{
-    //    Crystal.animationService.AnimateDestroy(Crystal.gameObject, Crystal.Destroy, 5f);
-    //}
-
     private void Subscribe(Board parent)
     {
         EndSwapping = parent.EndSwapping;
@@ -245,10 +225,5 @@ public class MonoCell : MonoBehaviour
                 return Direction.Left;
         }
     }
-
-    //private IEnumerator WaitUntilAnimEnd()
-    //{
-    //    yield return new WaitUntil(() => Crystal.animationService.Tween == null);
-    //}
 
 }

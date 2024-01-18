@@ -43,16 +43,8 @@ public class Board : MonoBehaviour
     //Works after swap is complete
     public void EndSwapping()
     {
-        #region Debug
-
-        Debug.Log($" CheckMatch count: {MonoCell._counter}");
-
-        #endregion
-
         DOTweenCrystalAnimService.EndAnimations();
         StartCheckingMatch();
-        //StartCheckingMatch();
-
     }
 
     public void StartCheckingMatch()
@@ -75,6 +67,7 @@ public class Board : MonoBehaviour
                 StartCheckingMatch();
         }
     }
+
     public void ClearMustDestroyedCrystals()
     {
         _isNeedClearCrystals = false;
@@ -86,6 +79,7 @@ public class Board : MonoBehaviour
                 _isNeedClearCrystals = true;
         }
     }
+
     public void CheckEmptySpaces()
     {
         for (int i = _height * _width-1; i >= 0 ; i--)
@@ -93,6 +87,7 @@ public class Board : MonoBehaviour
             Cells[i].TryMoveCrystalToEmptySpaces();
         }
     }
+
     private Neighbors FillNeighbors(int index)
     {
 
@@ -130,9 +125,4 @@ public class Board : MonoBehaviour
         }
         return null;
     }
-
-
-
-
-    
 }
