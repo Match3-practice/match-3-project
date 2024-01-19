@@ -50,6 +50,18 @@ public static class DOTweenCrystalAnimService
             sequence.Append(crystal.transform.DOMove(targetTransform.position, speed));
         }
     }
+    public static void AnimateMoveFromPointToPoint(GameObject crystal, Vector3 startTransform, Vector3 endTransform, float speed = 1f)
+    {
+        if (IsAnimated)
+            sequence.Join(crystal.transform.DOMove(endTransform, speed).From(startTransform));
+        else
+        {
+            IsAnimated = true;
+            if (sequence == null || !sequence.active)
+                sequence = DOTween.Sequence();
+            sequence.Append(crystal.transform.DOMove(endTransform, speed).From(startTransform));
+        }
+    }
     #region MetodDescription
     ///<summary>
     ///Animate crystal destruction
