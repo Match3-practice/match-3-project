@@ -33,9 +33,6 @@ public class Cell : MonoBehaviour
     public void InitializeCrystal(Crystal crystal)
     {
         Crystal = crystal;
-        //_crystal.SubscribeIntercationAction(TrySwap);
-        //Vector3 startPosition = new Vector3(transform.position.x, transform.position.y - transform.localScale.y);
-        //DOTweenCrystalAnimService.AnimateMoveFromPointToPoint(_crystal.gameObject, startPosition, this.transform.position);
     }
     public Cell GetNeighbor(Direction direction)
     {
@@ -195,7 +192,6 @@ public class Cell : MonoBehaviour
         Crystal temporary = neighbor.Crystal;
         neighbor.Crystal = Crystal;
         Crystal = temporary;
-
 
         EndSwapping?.Invoke();
     }

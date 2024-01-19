@@ -45,7 +45,7 @@ public class Board : MonoBehaviour
     }
     private void InitializeSpawnPosition()
     {
-        Cell[] row = GetCellsToIn();
+        Cell[] row = GetCellsToSpawnIn();
         for (int i = 0; i < row.Length; i++)
         {
             Vector3 cellPosition = row[i].transform.position;
@@ -65,15 +65,9 @@ public class Board : MonoBehaviour
                     break;
             }
         }
-        //for (int i = 0; i < _width; i++)
-        //{
-        //    Vector3 cellPosition = Cells[i].transform.position;
-        //    //RectTransform rect = Cells[i].GetComponent<RectTransform>();
-        //    //float hieght = rect.rect.height;
-        //    }
     }
 
-    private Cell[] GetCellsToIn()
+    private Cell[] GetCellsToSpawnIn()
     {
         Cell[] firstRow;
         switch (Gravity)
@@ -152,7 +146,7 @@ public class Board : MonoBehaviour
         while (hasEmptyCells)
         {
             hasEmptyCells = false;
-            Cell[] cellsToSpawn = GetCellsToIn();
+            Cell[] cellsToSpawn = GetCellsToSpawnIn();
             for (int i = 0; i < cellsToSpawn.Length; i++)
             {
                 if (cellsToSpawn[i].IsEmpty)
