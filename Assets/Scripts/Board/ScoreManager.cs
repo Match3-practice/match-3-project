@@ -12,7 +12,7 @@ public class ScoreManager : MonoBehaviour
     {
         OnScoreChange += WinChecker;
     }
-    public int TargetScore
+    public int Score
     {
         get => GetScore();
         set
@@ -24,15 +24,13 @@ public class ScoreManager : MonoBehaviour
 
     private const string SCORE_TAG = "Score";
 
-
     private void WinChecker()
     {
-        if(TargetScore >= targetScore)
+        if(Score >= targetScore)
         {
             OnWin?.Invoke();
         }
     }
-
 
     private int GetScore()
     {
@@ -47,6 +45,6 @@ public class ScoreManager : MonoBehaviour
     public void ClearScore()
     {
         uint zero = uint.MinValue;
-        TargetScore = (int)zero;
+        Score = (int)zero;
     }
 }
