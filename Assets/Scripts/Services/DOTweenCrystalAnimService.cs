@@ -58,6 +58,7 @@ public static class DOTweenCrystalAnimService
         }
     }
     
+
     #region MetodDescription
     ///<summary>
     ///Animate crystal destruction
@@ -101,5 +102,12 @@ public static class DOTweenCrystalAnimService
                 sequence.Append(animated);
         }
         IsAnimated = true;
+    }
+
+    private static Color GetNonTransparentColor(GameObject crystal)
+    {
+        Color color = crystal.GetComponent<Image>().color;
+        color.a = 1f;
+        return color;
     }
 }
