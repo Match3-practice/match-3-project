@@ -1,6 +1,7 @@
 using DG.Tweening;
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public static class DOTweenCrystalAnimService
 {
@@ -40,16 +41,24 @@ public static class DOTweenCrystalAnimService
     #endregion
     public static void AnimatePosition(GameObject crystal, Transform targetTransform, float speed = 1f)
     {
+        Color color = GetNonTransparentColor(crystal);
+
         if (IsAnimated)
-            sequence.Join(crystal.transform.DOMove(targetTransform.position, speed));
+            sequence.Join(crystal.transform.DOMove(targetTransform.position, speed))
+                    .Join(crystal.GetComponent<Image>().DOColor(color, speed));
+        
         else
         {
             IsAnimated = true;
             if (sequence == null || !sequence.active)
                 sequence = DOTween.Sequence();
-            sequence.Append(crystal.transform.DOMove(targetTransform.position, speed));
+            sequence.Append(crystal.transform.DOMove(targetTransform.position, speed))
+                    .Join(crystal.GetComponent<Image>().DOColor(color, speed));
+
         }
     }
+    
+
     #region MetodDescription
     ///<summary>
     ///Animate crystal destruction
@@ -93,5 +102,12 @@ public static class DOTweenCrystalAnimService
                 sequence.Append(animated);
         }
         IsAnimated = true;
+    }
+
+    private static Color GetNonTransparentColor(GameObject crystal)
+    {
+        Color color = crystal.GetComponent<Image>().color;
+        color.a = 1f;
+        return color;
     }
 }

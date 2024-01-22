@@ -30,6 +30,10 @@ public class Cell : MonoBehaviour
         }
     }
 
+    public void InitializeCrystal(Crystal crystal)
+    {
+        Crystal = crystal;
+    }
     public Cell GetNeighbor(Direction direction)
     {
         switch (direction)
@@ -188,7 +192,6 @@ public class Cell : MonoBehaviour
         Crystal temporary = neighbor.Crystal;
         neighbor.Crystal = Crystal;
         Crystal = temporary;
-
 
         EndSwapping?.Invoke();
     }
