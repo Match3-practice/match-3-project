@@ -2,6 +2,7 @@ using DG.Tweening;
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Board : MonoBehaviour
 {
@@ -11,8 +12,7 @@ public class Board : MonoBehaviour
 
     [SerializeField] private int _width = 5;
     [SerializeField] private int _height = 5;
-    [SerializeField]
-    private float _spacing = 10f;
+    [SerializeField] private float _spacing = 10f;
 
     public event Action _startCheckingMatch;
 
@@ -222,6 +222,7 @@ public class Board : MonoBehaviour
             Debug.Log("Generate new Crystals");
             CrystalData crystalData = _setOfCrystals[UnityEngine.Random.Range(0, _setOfCrystals.Length)];
             GameObject crystalPrefab = Instantiate(crystalData.Prefab, point, new Quaternion());
+            MakeTransparent(crystalPrefab);
             Crystal crystal = crystalPrefab.GetComponent<Crystal>();
             crystal.Type = crystalData.Type;
             return crystal;
@@ -231,5 +232,12 @@ public class Board : MonoBehaviour
             Debug.LogError("The set of crystals is not filled. Check the field \"Set Of Crystals\"");
         }
         return null;
+    }
+
+    private static void MakeTransparent(GameObject crystalPrefab)
+    {
+        Color color = crystalPrefab.GetComponent<Image>().color;
+        color.a = 0f;
+        crystalPrefab.GetComponent<Image>().color = color;
     }
 }
