@@ -57,30 +57,7 @@ public static class DOTweenCrystalAnimService
 
         }
     }
-    public static void AnimateMoveFromPointToPoint(GameObject crystal, Vector3 startTransform, Vector3 endTransform, float speed = 1f)
-    {
-        Color color = GetNonTransparentColor(crystal);
-
-        if (IsAnimated)
-            sequence.Join(crystal.transform.DOMove(endTransform, speed).From(startTransform))
-                    .Join(crystal.GetComponent<Image>().DOColor(color, speed));
-        else
-        {
-
-            IsAnimated = true;
-            if (sequence == null || !sequence.active)
-                sequence = DOTween.Sequence();
-            sequence.Append(crystal.transform.DOMove(endTransform, speed).From(startTransform))
-                    .Join(crystal.GetComponent<Image>().DOColor(color, speed));
-        }
-    }
-
-    private static Color GetNonTransparentColor(GameObject crystal)
-    {
-        Color color = crystal.GetComponent<Image>().color;
-        color.a = 1f;
-        return color;
-    }
+    
     #region MetodDescription
     ///<summary>
     ///Animate crystal destruction
