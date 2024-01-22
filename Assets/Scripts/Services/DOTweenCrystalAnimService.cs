@@ -50,6 +50,7 @@ public static class DOTweenCrystalAnimService
             sequence.Append(crystal.transform.DOMove(targetTransform.position, speed));
         }
     }
+    
     #region MetodDescription
     ///<summary>
     ///Animate crystal destruction

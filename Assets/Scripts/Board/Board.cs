@@ -11,6 +11,8 @@ public class Board : MonoBehaviour
 
     [SerializeField] private int _width = 5;
     [SerializeField] private int _height = 5;
+    [SerializeField]
+    private float _spacing = 10f;
 
     public event Action _startCheckingMatch;
 
@@ -21,6 +23,8 @@ public class Board : MonoBehaviour
     private int _cellCount;
     private bool _isNeedClearCrystals = false;
 
+    private Vector3[] _spawnPoints;
+
     private void Start()
     {
         InitializeBoard();
@@ -28,8 +32,8 @@ public class Board : MonoBehaviour
 
     private void InitializeBoard()
     {
+        _spawnPoints = new Vector3[_width];
         Cells = gameObject.GetComponentsInChildren<Cell>();
-
         for (int i = 0; i < _height * _width; i++)
         {
             Crystal crystal = GenerateCrystalInCell(Cells[i].gameObject);
@@ -39,7 +43,71 @@ public class Board : MonoBehaviour
             Cells[i].SetNeighbors(FillNeighbors(i));
         }
     }
+    private void InitializeSpawnPosition()
+    {
+        Cell[] row = GetCellsToSpawnIn();
+        for (int i = 0; i < row.Length; i++)
+        {
+            Vector3 cellPosition = row[i].transform.position;
+            switch (Gravity)
+            {
+                case Direction.Bottom:
+                    _spawnPoints[i] = new Vector3(cellPosition.x, cellPosition.y + _spacing, cellPosition.z);
+                    break;
+                case Direction.Top:
+                    _spawnPoints[i] = new Vector3(cellPosition.x, cellPosition.y - _spacing, cellPosition.z);
+                    break;
+                case Direction.Left:
+                    _spawnPoints[i] = new Vector3(cellPosition.x + _spacing, cellPosition.y, cellPosition.z);
+                    break;
+                case Direction.Right:
+                    _spawnPoints[i] = new Vector3(cellPosition.x - _spacing, cellPosition.y, cellPosition.z);
+                    break;
+            }
+        }
+    }
 
+    private Cell[] GetCellsToSpawnIn()
+    {
+        Cell[] firstRow;
+        switch (Gravity)
+        {
+            case Direction.Bottom:
+                {
+                    firstRow = new Cell[_width];
+                    for (int i = 0, k = 0; i < _width; i++, k++)
+                    {
+                        firstRow[k] = Cells[i];
+                    }
+                    return firstRow;
+                }
+            case Direction.Top:
+                {
+                    firstRow = new Cell[_width];
+                    for (int i = (_width - 1) * _height, k = 0; i < _width * _height; i++, k++)
+                    {
+                        firstRow[k] = Cells[i];
+                    }
+                    return firstRow;
+                }
+            case Direction.Left:
+                firstRow = new Cell[_height];
+                for (int i = _width - 1, k = 0; i < _width * _height; i += _width, k++)
+                {
+                    firstRow[k] = Cells[i];
+                }
+                return firstRow;
+            case Direction.Right:
+                firstRow = new Cell[_height];
+                for (int i = 0, k = 0; i < _width * _height; i += _width, k++)
+                {
+                    firstRow[k] = Cells[i];
+                }
+                return firstRow;
+            default:
+                return null;
+        }
+    }
     //Works after swap is complete
     public void EndSwapping()
     {
@@ -63,8 +131,33 @@ public class Board : MonoBehaviour
             DOTweenCrystalAnimService.EndAnimations();
             CheckEmptySpaces();
             DOTweenCrystalAnimService.EndAnimations();
+            SpawnCrystalsAfterStep();
+            DOTweenCrystalAnimService.EndAnimations();
             if (_isNeedClearCrystals)
                 StartCheckingMatch();
+        }
+    }
+    //spawn crystals in empty cells of
+    //the first row or column
+    public void SpawnCrystalsAfterStep()
+    {
+        InitializeSpawnPosition();
+        bool hasEmptyCells = true;
+        while (hasEmptyCells)
+        {
+            hasEmptyCells = false;
+            Cell[] cellsToSpawn = GetCellsToSpawnIn();
+            for (int i = 0; i < cellsToSpawn.Length; i++)
+            {
+                if (cellsToSpawn[i].IsEmpty)
+                {
+                    hasEmptyCells = true;
+                    Crystal newCrystal = GenerateCrystalInPoint(_spawnPoints[i]);
+                    cellsToSpawn[i].InitializeCrystal(newCrystal);
+                }
+            }
+            DOTweenCrystalAnimService.EndAnimations();
+            CheckEmptySpaces();
         }
     }
 
@@ -73,7 +166,6 @@ public class Board : MonoBehaviour
         _isNeedClearCrystals = false;
         for (int i = 0; i < _height * _width; i++)
         {
-
             bool result = Cells[i].ClearCrystal();
             if (result)
                 _isNeedClearCrystals = true;
@@ -82,7 +174,7 @@ public class Board : MonoBehaviour
 
     public void CheckEmptySpaces()
     {
-        for (int i = _height * _width-1; i >= 0 ; i--)
+        for (int i = _height * _width - 1; i >= 0; i--)
         {
             Cells[i].TryMoveCrystalToEmptySpaces();
         }
@@ -90,9 +182,7 @@ public class Board : MonoBehaviour
 
     private Neighbors FillNeighbors(int index)
     {
-
         Neighbors neighbors = new Neighbors();
-
 
         if (Cells == null)
             return neighbors;
@@ -115,6 +205,23 @@ public class Board : MonoBehaviour
         {
             CrystalData crystalData = _setOfCrystals[UnityEngine.Random.Range(0, _setOfCrystals.Length)];
             GameObject crystalPrefab = Instantiate(crystalData.Prefab, cell.transform);
+            Crystal crystal = crystalPrefab.GetComponent<Crystal>();
+            crystal.Type = crystalData.Type;
+            return crystal;
+        }
+        catch (IndexOutOfRangeException)
+        {
+            Debug.LogError("The set of crystals is not filled. Check the field \"Set Of Crystals\"");
+        }
+        return null;
+    }
+    private Crystal GenerateCrystalInPoint(Vector3 point)
+    {
+        try
+        {
+            Debug.Log("Generate new Crystals");
+            CrystalData crystalData = _setOfCrystals[UnityEngine.Random.Range(0, _setOfCrystals.Length)];
+            GameObject crystalPrefab = Instantiate(crystalData.Prefab, point, new Quaternion());
             Crystal crystal = crystalPrefab.GetComponent<Crystal>();
             crystal.Type = crystalData.Type;
             return crystal;
