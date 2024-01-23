@@ -119,7 +119,6 @@ public class Cell : MonoBehaviour
             Cell neighborForward = GetNeighbor(direction);
             Cell neighborBackward = GetNeighbor(directionReverse);
 
-            Debug.Log($"Match: {Crystal.Type}");
             CheckNeighborsMatch(neighborForward, direction);
             CheckNeighborsMatch(neighborBackward, directionReverse);
             Crystal.MustDestroy = true;
@@ -135,7 +134,6 @@ public class Cell : MonoBehaviour
             cell.Crystal.MustDestroy = true;
             return;
         }
-        Debug.Log($"Match: {neighbor.Crystal.Type}");
         CheckNeighborsMatch(neighbor, direction);
         cell.Crystal.MustDestroy = true;
     }
@@ -148,7 +146,6 @@ public class Cell : MonoBehaviour
             return;
         }
         if (cell.Crystal != null)
-
             Debug.Log(neighbor.gameObject.name);
         Debug.Log(cell.gameObject.name);
 
