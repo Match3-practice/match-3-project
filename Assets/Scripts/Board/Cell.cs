@@ -13,6 +13,7 @@ public class Cell : MonoBehaviour
 
     public event Action EndSwapping;
     public event Action EndCheckMatching;
+    public static event Action<Types> OnCrystalDestroy;
 
     public Crystal Crystal
     {
@@ -56,6 +57,8 @@ public class Cell : MonoBehaviour
         if (Crystal != null && Crystal.MustDestroy)
         {
             DOTweenCrystalAnimService.AnimateDestroy(Crystal.gameObject, Crystal.Destroy, 0.8f);
+
+            OnCrystalDestroy?.Invoke(Crystal.Type);
 
             Crystal = null;
             return true;

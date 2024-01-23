@@ -11,6 +11,7 @@ public class ScoreManager : MonoBehaviour
     private void Awake()
     {
         OnScoreChange += WinChecker;
+       
     }
     public int Score
     {
@@ -42,7 +43,7 @@ public class ScoreManager : MonoBehaviour
         PlayerPrefs.SetInt(SCORE_TAG, PlayerPrefs.GetInt(SCORE_TAG) + score);
     }
 
-    public void ClearScore()
+    private void ClearScore()
     {
         uint zero = uint.MinValue;
         Score = (int)zero;
