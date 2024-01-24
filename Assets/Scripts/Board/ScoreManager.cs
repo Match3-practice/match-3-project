@@ -8,11 +8,9 @@ public class ScoreManager : MonoBehaviour
     public event Action OnScoreChange;
     public event Action OnWin;
 
-    private void Awake()
-    {
-        OnScoreChange += WinChecker;
-       
-    }
+    private const string SCORE_TAG = "Score";
+    private const int DEF_CRYSTAL_SCORE = 1;
+
     public int Score
     {
         get => GetScore();
@@ -23,7 +21,17 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-    private const string SCORE_TAG = "Score";
+    private void Awake()
+    {
+        OnScoreChange += WinChecker;
+        Cell.OnCrystalDestroy += CrysralDestroyHandler;
+    }
+
+    private void CrysralDestroyHandler(Types types)
+    {
+        //It`s temporary solution
+        AddScore(DEF_CRYSTAL_SCORE);
+    }
 
     private void WinChecker()
     {
@@ -33,19 +41,18 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-    private int GetScore()
-    {
-        return PlayerPrefs.GetInt(SCORE_TAG);
-    }
-
     private void AddScore(int score)
     {
         PlayerPrefs.SetInt(SCORE_TAG, PlayerPrefs.GetInt(SCORE_TAG) + score);
     }
 
-    private void ClearScore()
+    //private void ClearScore()
+    //{
+    //    uint zero = uint.MinValue;
+    //    Score = (int)zero;
+    //}
+    private int GetScore()
     {
-        uint zero = uint.MinValue;
-        Score = (int)zero;
+        return PlayerPrefs.GetInt(SCORE_TAG);
     }
 }
