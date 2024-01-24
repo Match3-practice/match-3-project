@@ -25,17 +25,13 @@ public class Crystal : MonoBehaviour
     public void ChangePositionInBoard(Cell newCell)
     {
         gameObject.transform.SetParent(newCell.Position);
-
-        if(gameObject != null && newCell != null)
+        gameObject.transform.localScale = newCell.transform.localScale;
+        if (gameObject != null && newCell != null)
             DOTweenCrystalAnimService.AnimatePosition(gameObject, newCell.transform, 0.5f);
 
         UnsubscribeAll();
         SubscribeIntercationAction(newCell.TrySwap);
     }
-    //public void ChangePosition(Vector3 newPosition)
-    //{
-    //    transform.localPosition = newPosition;
-    //}
     public void UnsubscribeAll()
     {
         _interactAction = null;
