@@ -19,7 +19,7 @@ public class Board : MonoBehaviour
 
     public Direction Gravity = Direction.Bottom;
 
-    public Cell[] Cells {  get; private set; }
+    public Cell[] Cells { get; private set; }
     public int Width { get => _width; }
     public int Height { get => _height; }
 
@@ -224,37 +224,32 @@ public class Board : MonoBehaviour
 
     private Crystal GenerateCrystalInCell(GameObject cell, int currentIndex = -1)
     {
-        try
-        {
-            CrystalData crystalData = ChooseCrystalToSpawn(currentIndex);
-            GameObject crystalPrefab = Instantiate(crystalData.Prefab, cell.transform);
-            Crystal crystal = crystalPrefab.GetComponent<Crystal>();
-            crystal.Type = crystalData.Type;
-            return crystal;
-        }
-        catch (IndexOutOfRangeException)
+        if (_setOfCrystals.Length == 0)
         {
             Debug.LogError("The set of crystals is not filled. Check the field \"Set Of Crystals\"");
+            return null;
         }
-        return null;
+
+        CrystalData crystalData = ChooseCrystalToSpawn(currentIndex);
+        GameObject crystalPrefab = Instantiate(crystalData.Prefab, cell.transform);
+        Crystal crystal = crystalPrefab.GetComponent<Crystal>();
+        crystal.Type = crystalData.Type;
+        return crystal;
     }
 
     private Crystal GenerateCrystalInPoint(Vector3 point)
     {
-        try
-        {
-            CrystalData crystalData = _setOfCrystals[UnityEngine.Random.Range(0, _setOfCrystals.Length)];
-            GameObject crystalPrefab = Instantiate(crystalData.Prefab, point, new Quaternion());
-            MakeTransparent(crystalPrefab);
-            Crystal crystal = crystalPrefab.GetComponent<Crystal>();
-            crystal.Type = crystalData.Type;
-            return crystal;
-        }
-        catch (IndexOutOfRangeException)
+        if (_setOfCrystals.Length == 0)
         {
             Debug.LogError("The set of crystals is not filled. Check the field \"Set Of Crystals\"");
+            return null;
         }
-        return null;
+        CrystalData crystalData = _setOfCrystals[UnityEngine.Random.Range(0, _setOfCrystals.Length)];
+        GameObject crystalPrefab = Instantiate(crystalData.Prefab, point, new Quaternion());
+        MakeTransparent(crystalPrefab);
+        Crystal crystal = crystalPrefab.GetComponent<Crystal>();
+        crystal.Type = crystalData.Type;
+        return crystal;
     }
 
     private CrystalData ChooseCrystalToSpawn(int cellIndex)
@@ -305,15 +300,15 @@ public class Board : MonoBehaviour
             }
         }
 
-        try
-        {
-            //select a crystal randomly from the remaining ones
-            crystalData = (CrystalData)crystals[UnityEngine.Random.Range(0, crystals.Count)];
-        }
-        catch (IndexOutOfRangeException)
+        if (crystals.Count == 0)
         {
             Debug.LogError("There are no crystals left for spawning! Crystal selected randomly. Be careful, there may be repetitions!");
             crystalData = _setOfCrystals[UnityEngine.Random.Range(0, _setOfCrystals.Length)];
+        }
+        else
+        {
+            //select a crystal randomly from the remaining ones
+            crystalData = (CrystalData)crystals[UnityEngine.Random.Range(0, crystals.Count)];
         }
         return crystalData;
     }
