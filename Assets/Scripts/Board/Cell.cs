@@ -174,8 +174,7 @@ public class Cell : MonoBehaviour
     {
         Cell lastSwapNeighbor = _lastSwapInfo.NeighborCell;
         if (lastSwapNeighbor == null)
-            return false;
-        _lastSwapInfo.Clear(); 
+            return false; 
         return true;
     }
     private void MoveToEmptySpace(Cell cell)
@@ -239,7 +238,11 @@ public class Cell : MonoBehaviour
     {
         Cell neighbor = _lastSwapInfo.NeighborCell;
         if (neighbor == null)
+        {
             Debug.LogError($"The neighbor doesn't exist. Direction: {_lastSwapInfo.SwapDirection}");
+            return;
+        }
+        _lastSwapInfo.Clear();
         SwapWithNeighbor(neighbor);
     }
     private bool CanSwap(Direction direction)

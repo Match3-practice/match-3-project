@@ -245,7 +245,6 @@ public class Board : MonoBehaviour
             Debug.LogError("The set of crystals is not filled. Check the field \"Set Of Crystals\"");
             return null;
         }
-
         CrystalData crystalData = ChooseCrystalToSpawn(currentIndex);
         GameObject crystalPrefab = Instantiate(crystalData.Prefab, cell.transform);
         Crystal crystal = crystalPrefab.GetComponent<Crystal>();
@@ -334,5 +333,5 @@ public class Board : MonoBehaviour
         color.a = 0f;
         crystalPrefab.GetComponent<Image>().color = color;
     }
-    
+
 }
