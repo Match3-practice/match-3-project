@@ -27,7 +27,8 @@ public class Board : MonoBehaviour
     private bool _isNeedClearCrystals = false;
 
     private Vector3[] _spawnPoints;
-
+    public bool MustUpdateBoard { get; set; }
+    private Cell _swappedCell;
     private void Start()
     {
         if (_isBoardCreated)
@@ -132,6 +133,10 @@ public class Board : MonoBehaviour
                 return null;
         }
     }
+    public void StartSwapping(Cell cell)
+    {
+        _swappedCell = cell;
+    }
     //Works after swap is complete
     public void EndSwapping()
     {
@@ -150,14 +155,25 @@ public class Board : MonoBehaviour
         _cellCount--;
         if (_cellCount == 0)
         {
-            ClearMustDestroyedCrystals();
-            DOTweenCrystalAnimService.EndAnimations();
-            CheckEmptySpaces();
-            DOTweenCrystalAnimService.EndAnimations();
-            SpawnCrystalsAfterStep();
-            DOTweenCrystalAnimService.EndAnimations();
-            if (_isNeedClearCrystals)
-                StartCheckingMatch();
+            if (MustUpdateBoard)
+            {
+                ClearMustDestroyedCrystals();
+                DOTweenCrystalAnimService.EndAnimations();
+                CheckEmptySpaces();
+                DOTweenCrystalAnimService.EndAnimations();
+                SpawnCrystalsAfterStep();
+                DOTweenCrystalAnimService.EndAnimations();
+                if (_isNeedClearCrystals)
+                    StartCheckingMatch();
+
+                MustUpdateBoard = false;
+            }
+            else if (!MustUpdateBoard && _swappedCell != null)
+            {
+                _swappedCell.Restore();
+                _swappedCell = null;
+                DOTweenCrystalAnimService.EndAnimations();
+            }
         }
     }
     //spawn crystals in empty cells of
@@ -323,4 +339,5 @@ public class Board : MonoBehaviour
         color.a = 0f;
         crystalPrefab.GetComponent<Image>().color = color;
     }
+    
 }
