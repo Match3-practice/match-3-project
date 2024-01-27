@@ -25,7 +25,6 @@ public class Crystal : MonoBehaviour
 
     public void ChangePositionInBoard(Cell newCell)
     {
-        gameObject.transform.SetParent(newCell.Position);
         if (gameObject != null && newCell != null)
             DOTweenCrystalAnimService.AnimatePosition(gameObject, newCell.transform, 0.5f);
 
