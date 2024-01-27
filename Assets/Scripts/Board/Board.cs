@@ -27,6 +27,8 @@ public class Board : MonoBehaviour
     private bool _isNeedClearCrystals = false;
 
     private Vector3[] _spawnPoints;
+    public bool MustUpdateBoard { get; set; }
+    private Cell _swappedCell;
 
     private void Start()
     {
@@ -132,6 +134,10 @@ public class Board : MonoBehaviour
                 return null;
         }
     }
+    public void StartSwapping(Cell cell)
+    {
+        _swappedCell = cell;
+    }
     //Works after swap is complete
     public void EndSwapping()
     {
@@ -150,14 +156,25 @@ public class Board : MonoBehaviour
         _cellCount--;
         if (_cellCount == 0)
         {
-            ClearMustDestroyedCrystals();
-            DOTweenCrystalAnimService.EndAnimations();
-            CheckEmptySpaces();
-            DOTweenCrystalAnimService.EndAnimations();
-            SpawnCrystalsAfterStep();
-            DOTweenCrystalAnimService.EndAnimations();
-            if (_isNeedClearCrystals)
-                StartCheckingMatch();
+            if (MustUpdateBoard)
+            {
+                ClearMustDestroyedCrystals();
+                DOTweenCrystalAnimService.EndAnimations();
+                CheckEmptySpaces();
+                DOTweenCrystalAnimService.EndAnimations();
+                SpawnCrystalsAfterStep();
+                DOTweenCrystalAnimService.EndAnimations();
+                if (_isNeedClearCrystals)
+                    StartCheckingMatch();
+
+                MustUpdateBoard = false;
+            }
+            else if (!MustUpdateBoard && _swappedCell != null)
+            {
+                _swappedCell.Restore();
+                _swappedCell = null;
+                DOTweenCrystalAnimService.EndAnimations();
+            }
         }
     }
     //spawn crystals in empty cells of
@@ -175,7 +192,7 @@ public class Board : MonoBehaviour
                 if (cellsToSpawn[i].IsEmpty)
                 {
                     hasEmptyCells = true;
-                    Crystal newCrystal = GenerateCrystalInPoint(_spawnPoints[i]);
+                    Crystal newCrystal = GenerateCrystalInPoint(_spawnPoints[i], cellsToSpawn[i].gameObject);
                     cellsToSpawn[i].InitializeCrystal(newCrystal);
                 }
             }
@@ -229,7 +246,6 @@ public class Board : MonoBehaviour
             Debug.LogError("The set of crystals is not filled. Check the field \"Set Of Crystals\"");
             return null;
         }
-
         CrystalData crystalData = ChooseCrystalToSpawn(currentIndex);
         GameObject crystalPrefab = Instantiate(crystalData.Prefab, cell.transform);
         Crystal crystal = crystalPrefab.GetComponent<Crystal>();
@@ -237,7 +253,7 @@ public class Board : MonoBehaviour
         return crystal;
     }
 
-    private Crystal GenerateCrystalInPoint(Vector3 point)
+    private Crystal GenerateCrystalInPoint(Vector3 point,GameObject parent = null)
     {
         if (_setOfCrystals.Length == 0)
         {
@@ -245,7 +261,7 @@ public class Board : MonoBehaviour
             return null;
         }
         CrystalData crystalData = _setOfCrystals[UnityEngine.Random.Range(0, _setOfCrystals.Length)];
-        GameObject crystalPrefab = Instantiate(crystalData.Prefab, point, new Quaternion());
+        GameObject crystalPrefab = Instantiate(crystalData.Prefab, point, new Quaternion(), parent.transform);
         MakeTransparent(crystalPrefab);
         Crystal crystal = crystalPrefab.GetComponent<Crystal>();
         crystal.Type = crystalData.Type;
@@ -271,31 +287,44 @@ public class Board : MonoBehaviour
 
         if (leftCell != null || topCell != null)
         {
-            //get the element to the left one
-            //position from the current one
-            int lefLeftIndex = cellIndex - 2;
-            Cell leftLeftCell = cellIndex % _width == 1 || lefLeftIndex < 0 ? null : Cells[lefLeftIndex];
-            //get the element one position
-            //above the current one
-            int topTopIndex = cellIndex - _width * 2;
-            Cell topTopCell = topTopIndex < 0 ? null : Cells[topTopIndex];
-
-            //checking if two crystals to the left of
-            //the current one are the same
-            bool isHorizontalMatch = leftLeftCell?.Crystal.Type == leftCell?.Crystal.Type;
-            //checking if two crystals above the
-            //current one are the same
-            bool isVerticalMatch = topTopCell?.Crystal.Type == topCell?.Crystal.Type;
-
-            if (isHorizontalMatch || isVerticalMatch)
+            if (UnityEngine.Random.Range(0f, 1f) > 0.3f)
             {
-                //remove from the list a possible crystal for spawning
                 foreach (CrystalData crystal in _setOfCrystals)
                 {
                     if (crystal.Type == leftCell?.Crystal.Type)
                         crystals.Remove(crystal);
                     if (crystal.Type == topCell?.Crystal.Type)
                         crystals.Remove(crystal);
+                }
+            }
+            else
+            {
+                //get the element to the left one
+                //position from the current one
+                int lefLeftIndex = cellIndex - 2;
+                Cell leftLeftCell = cellIndex % _width == 1 || lefLeftIndex < 0 ? null : Cells[lefLeftIndex];
+                //get the element one position
+                //above the current one
+                int topTopIndex = cellIndex - _width * 2;
+                Cell topTopCell = topTopIndex < 0 ? null : Cells[topTopIndex];
+
+                //checking if two crystals to the left of
+                //the current one are the same
+                bool isHorizontalMatch = leftLeftCell?.Crystal.Type == leftCell?.Crystal.Type;
+                //checking if two crystals above the
+                //current one are the same
+                bool isVerticalMatch = topTopCell?.Crystal.Type == topCell?.Crystal.Type;
+
+                if (isHorizontalMatch || isVerticalMatch)
+                {
+                    //remove from the list a possible crystal for spawning
+                    foreach (CrystalData crystal in _setOfCrystals)
+                    {
+                        if (crystal.Type == leftCell?.Crystal.Type)
+                            crystals.Remove(crystal);
+                        if (crystal.Type == topCell?.Crystal.Type)
+                            crystals.Remove(crystal);
+                    }
                 }
             }
         }
@@ -318,4 +347,5 @@ public class Board : MonoBehaviour
         color.a = 0f;
         crystalPrefab.GetComponent<Image>().color = color;
     }
+
 }
