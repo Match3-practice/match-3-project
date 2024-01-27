@@ -203,8 +203,8 @@ GameObject:
   - component: {fileID: 944223908}
   - component: {fileID: 944223907}
   - component: {fileID: 944223906}
-  - component: {fileID: 944223904}
   - component: {fileID: 944223909}
+  - component: {fileID: 944223910}
   m_Layer: 5
   m_Name: Board
   m_TagString: Untagged
@@ -226,25 +226,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1126832813}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 720, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 1480, y: -3042.2222}
+  m_SizeDelta: {x: 2960, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &944223904
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 944223902}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalFit: 2
-  m_VerticalFit: 2
 --- !u!114 &944223906
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -268,7 +254,7 @@ MonoBehaviour:
   m_CellSize: {x: 200, y: 200}
   m_Spacing: {x: 10, y: 10}
   m_Constraint: 1
-  m_ConstraintCount: 5
+  m_ConstraintCount: 8
 --- !u!114 &944223907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -282,7 +268,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -323,13 +309,28 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4f042126f55835b4c93e5e06b36282cf, type: 2}
   - {fileID: 11400000, guid: fcdee6bfeb6ab5f4a94c6d1d329996a4, type: 2}
   - {fileID: 11400000, guid: d79a2aec5896fbc4398b210905e897c5, type: 2}
+  - {fileID: 11400000, guid: 088dd3c15a7e8034bba31284a87454c5, type: 2}
   _cellPrefab: {fileID: 8316105179779688677, guid: f03c8a42f5baa3045841b1fd4292517f,
     type: 3}
-  _width: 5
-  _height: 5
+  _width: 8
+  _height: 8
   _spacing: 10
   _isBoardCreated: 0
   Gravity: 3
+--- !u!114 &944223910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 944223902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86710e43de46f6f4bac7c8e50813a599, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AspectMode: 1
+  m_AspectRatio: 0.5
 --- !u!1 &1126832812
 GameObject:
   m_ObjectHideFlags: 0
@@ -627,10 +628,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 2960, y: 1440}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3

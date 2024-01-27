@@ -42,6 +42,7 @@ public static class DOTweenCrystalAnimService
     public static void AnimatePosition(GameObject crystal, Transform targetTransform, float speed = 1f)
     {
         Color color = GetNonTransparentColor(crystal);
+        //crystal.transform.localScale = targetTransform.localScale;
 
         if (IsAnimated)
             sequence.Join(crystal.transform.DOMove(targetTransform.position, speed))
