@@ -16,6 +16,41 @@ public struct SwapInfo
         SwapDirection = Direction.None;
     }
 }
+public struct MatchInfo
+{
+    public bool matchVertival;
+    public bool matchHorizontal;
+    public ushort countHorizontalMatch;
+    public ushort countVerticalMatch;
+
+    public MatchInfo(int count = 0)
+    {
+        matchVertival = false;
+        matchHorizontal = false;
+        countHorizontalMatch = 0;
+        countVerticalMatch = 0;
+    }
+
+    public void Match(Direction direction)
+    {
+        if (direction == Direction.Left || direction == Direction.Right)
+            HorizontalMatch();
+        else if (direction == Direction.Top || direction == Direction.Bottom)
+            VerticalMatch();
+    }
+    private void VerticalMatch()
+    {
+        matchVertival = true;
+        countVerticalMatch++;
+    }
+
+    private void HorizontalMatch()
+    {
+        matchHorizontal = true;
+        countHorizontalMatch++;
+    }
+
+}
 public class Cell : MonoBehaviour
 {
     [HideInInspector] public Direction Gravity;
@@ -32,7 +67,8 @@ public class Cell : MonoBehaviour
     public event Action EndCheckMatching;
     public event Action FoundCrystalToDestroy;
 
-
+    private MatchInfo _matchInfo;
+    private bool _mustChangeType = false;
     public Crystal Crystal
     {
         get => _crystal;
@@ -126,6 +162,7 @@ public class Cell : MonoBehaviour
 
     private void CheckMatch()
     {
+        _matchInfo = new MatchInfo();
         if (Crystal != null)
             CheckMatchByDirection(Direction.Right, GetReverseDirection(Direction.Right));
         if (Crystal != null)
@@ -148,6 +185,7 @@ public class Cell : MonoBehaviour
             CheckNeighborsMatch(neighborBackward, directionReverse);
             MarkCrystalToDestroy(Crystal);
             FoundCrystalToDestroy?.Invoke();
+            _matchInfo.Match(direction);
         }
     }
 
@@ -158,10 +196,12 @@ public class Cell : MonoBehaviour
         if (neighbor == null || neighbor.Crystal == null || neighbor.Crystal.Type != cell.Crystal.Type)
         {
             MarkCrystalToDestroy(cell.Crystal);
+            _matchInfo.Match(direction);
             return;
         }
         CheckNeighborsMatch(neighbor, direction);
         MarkCrystalToDestroy(cell.Crystal);
+        _matchInfo.Match(direction);
     }
     public void Restore()
     {
@@ -174,7 +214,7 @@ public class Cell : MonoBehaviour
     {
         Cell lastSwapNeighbor = _lastSwapInfo.NeighborCell;
         if (lastSwapNeighbor == null)
-            return false; 
+            return false;
         return true;
     }
     private void MoveToEmptySpace(Cell cell)
