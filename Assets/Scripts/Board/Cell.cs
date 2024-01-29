@@ -1,7 +1,21 @@
 using System;
 using System.Collections;
 using UnityEngine;
-
+public struct SwapInfo
+{
+    public Cell NeighborCell;
+    public Direction SwapDirection;
+    public SwapInfo(Cell neighborCell, Direction swapDirection)
+    {
+        this.NeighborCell = neighborCell;
+        this.SwapDirection = swapDirection;
+    }
+    public void Clear()
+    {
+        NeighborCell = null;
+        SwapDirection = Direction.None;
+    }
+}
 public class Cell : MonoBehaviour
 {
     [HideInInspector] public Direction Gravity;
@@ -11,9 +25,13 @@ public class Cell : MonoBehaviour
     public Transform Position { get => gameObject.transform; }
     public bool IsEmpty { get; private set; } = false;
 
+    private SwapInfo _lastSwapInfo;
+
+    public event Action<Cell> StartSwapping;
     public event Action EndSwapping;
     public event Action EndCheckMatching;
-    public static event Action<Types> OnCrystalDestroy;
+    public event Action FoundCrystalToDestroy;
+
 
     public Crystal Crystal
     {
@@ -93,9 +111,16 @@ public class Cell : MonoBehaviour
         Cell neighbor = GetNeighbor(direction);
         if (neighbor == null)
             Debug.LogError($"The neighbor doesn't exist. Direction: {direction}");
+        StartSwapping?.Invoke(this);
         SwapWithNeighbor(neighbor);
-    }
+        SaveSwapInfo(neighbor, direction);
 
+        EndSwapping?.Invoke();
+    }
+    private void SaveSwapInfo(Cell cellToSwap, Direction swapDirection)
+    {
+        _lastSwapInfo = new SwapInfo(cellToSwap, swapDirection);
+    }
     public void SetNeighbors(Neighbors neighbors)
     {
         _neighbors = neighbors;
@@ -107,14 +132,13 @@ public class Cell : MonoBehaviour
             CheckMatchByDirection(Direction.Right, GetReverseDirection(Direction.Right));
         if (Crystal != null)
             CheckMatchByDirection(Direction.Top, GetReverseDirection(Direction.Top));
-        if (Crystal != null && Crystal.MustDestroy)
-        {
-            Crystal.MustDestroy = true;
-        }
-
-        EndCheckMatching?.Invoke();
+        EndCheckMatch();
     }
 
+    private void EndCheckMatch()
+    {
+        EndCheckMatching?.Invoke();
+    }
     private void CheckMatchByDirection(Direction direction, Direction directionReverse)
     {
         if (HasNeighborSameTypeCrystal(direction) && HasNeighborSameTypeCrystal(directionReverse))
@@ -122,10 +146,10 @@ public class Cell : MonoBehaviour
             Cell neighborForward = GetNeighbor(direction);
             Cell neighborBackward = GetNeighbor(directionReverse);
 
-            Debug.Log($"Match: {Crystal.Type}");
             CheckNeighborsMatch(neighborForward, direction);
             CheckNeighborsMatch(neighborBackward, directionReverse);
-            Crystal.MustDestroy = true;
+            MarkCrystalToDestroy(Crystal);
+            FoundCrystalToDestroy?.Invoke();
         }
     }
 
@@ -135,14 +159,26 @@ public class Cell : MonoBehaviour
         //until the neighboring crystal is of a different type
         if (neighbor == null || neighbor.Crystal == null || neighbor.Crystal.Type != cell.Crystal.Type)
         {
-            cell.Crystal.MustDestroy = true;
+            MarkCrystalToDestroy(cell.Crystal);
             return;
         }
-        Debug.Log($"Match: {neighbor.Crystal.Type}");
         CheckNeighborsMatch(neighbor, direction);
-        cell.Crystal.MustDestroy = true;
+        MarkCrystalToDestroy(cell.Crystal);
     }
-
+    public void Restore()
+    {
+        if (CheckIfSwapBackNeed())
+        {
+            SwapBack();
+        }
+    }
+    private bool CheckIfSwapBackNeed()
+    {
+        Cell lastSwapNeighbor = _lastSwapInfo.NeighborCell;
+        if (lastSwapNeighbor == null)
+            return false; 
+        return true;
+    }
     private void MoveToEmptySpace(Cell cell)
     {
         Cell neighbor = cell?.GetNeighbor(Gravity);
@@ -151,7 +187,6 @@ public class Cell : MonoBehaviour
             return;
         }
         if (cell.Crystal != null)
-
             Debug.Log(neighbor.gameObject.name);
         Debug.Log(cell.gameObject.name);
 
@@ -182,12 +217,17 @@ public class Cell : MonoBehaviour
                 break;
         }
     }
-
+    private void MarkCrystalToDestroy(Crystal crystal)
+    {
+        crystal.MustDestroy = true;
+    }
     private void Subscribe(Board parent)
     {
+        StartSwapping = parent.StartSwapping;
         EndSwapping = parent.EndSwapping;
         EndCheckMatching = parent.CellEndCheckMaching;
         parent._startCheckingMatch += CheckMatch;
+        FoundCrystalToDestroy = () => parent.MustUpdateBoard = true;
     }
 
     private void SwapWithNeighbor(Cell neighbor)
@@ -195,10 +235,18 @@ public class Cell : MonoBehaviour
         Crystal temporary = neighbor.Crystal;
         neighbor.Crystal = Crystal;
         Crystal = temporary;
-
-        EndSwapping?.Invoke();
     }
-
+    private void SwapBack()
+    {
+        Cell neighbor = _lastSwapInfo.NeighborCell;
+        if (neighbor == null)
+        {
+            Debug.LogError($"The neighbor doesn't exist. Direction: {_lastSwapInfo.SwapDirection}");
+            return;
+        }
+        _lastSwapInfo.Clear();
+        SwapWithNeighbor(neighbor);
+    }
     private bool CanSwap(Direction direction)
     {
         Cell neighbor = GetNeighbor(direction);

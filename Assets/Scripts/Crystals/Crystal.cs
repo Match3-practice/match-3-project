@@ -7,13 +7,14 @@ public class Crystal : MonoBehaviour
     public Interaction _interactionSystem;
     public Vector2 Position { get => transform.localPosition; }
     public Types Type { get; set; }
+    public RectTransform rectTransform;
 
     public bool MustDestroy { get; set; } = false;
     private void Start()
     {
         _interactionSystem = gameObject.AddComponent<Interaction>();        
         _interactionSystem.SwapAction += OnInteract;
-
+        rectTransform = GetComponent<RectTransform>();
     }
 
     public void OnInteract(Direction direction)
@@ -24,18 +25,12 @@ public class Crystal : MonoBehaviour
 
     public void ChangePositionInBoard(Cell newCell)
     {
-        gameObject.transform.SetParent(newCell.Position);
-
-        if(gameObject != null && newCell != null)
+        if (gameObject != null && newCell != null)
             DOTweenCrystalAnimService.AnimatePosition(gameObject, newCell.transform, 0.5f);
 
         UnsubscribeAll();
         SubscribeIntercationAction(newCell.TrySwap);
     }
-    //public void ChangePosition(Vector3 newPosition)
-    //{
-    //    transform.localPosition = newPosition;
-    //}
     public void UnsubscribeAll()
     {
         _interactAction = null;

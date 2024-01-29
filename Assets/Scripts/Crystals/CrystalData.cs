@@ -6,7 +6,8 @@ public enum Types
 {
     Red,
     Blue,
-    Green
+    Green,
+    White
 }
 
 [CreateAssetMenu(fileName = "Crystal Data", menuName = "Match 3/Crystal Data")]
