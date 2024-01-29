@@ -6,8 +6,9 @@ public class Crystal : MonoBehaviour
     private event Action<Direction> _interactAction;
     public Interaction _interactionSystem;
     public Vector2 Position { get => transform.localPosition; }
-    public Types Type { get; set; }
+    public Types Type { get=>type; set { type = value; } }
     public RectTransform rectTransform;
+    public Types type;
 
     public bool MustDestroy { get; set; } = false;
     private void Start()
@@ -25,6 +26,7 @@ public class Crystal : MonoBehaviour
 
     public void ChangePositionInBoard(Cell newCell)
     {
+        transform.SetParent(newCell.transform);
         if (gameObject != null && newCell != null)
             DOTweenCrystalAnimService.AnimatePosition(gameObject, newCell.transform, 0.5f);
 

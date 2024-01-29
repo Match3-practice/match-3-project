@@ -3,6 +3,12 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum BoardGenerateType
+{
+    FromCells,
+    FromScene,
+    FromZero
+}
 public class Board : MonoBehaviour
 {
     [SerializeField] private CrystalData[] _setOfCrystals;
@@ -13,7 +19,7 @@ public class Board : MonoBehaviour
     [SerializeField] [Min(3)] private int _height = 5;
     [SerializeField] private float _spacing = 10f;
 
-    [SerializeField] private bool _isBoardCreated = true;
+    [SerializeField] private BoardGenerateType _generatedType = BoardGenerateType.FromCells;
 
     public event Action _startCheckingMatch;
 
@@ -32,9 +38,11 @@ public class Board : MonoBehaviour
 
     private void Start()
     {
-        if (_isBoardCreated)
+        if(_generatedType == BoardGenerateType.FromScene)
+            InitializeBoardFromBoard();
+        if (_generatedType == BoardGenerateType.FromCells)
             InitializeBoard();
-        else
+        if (_generatedType == BoardGenerateType.FromZero)
             InitializeBoardFromZero();
     }
 
@@ -63,6 +71,21 @@ public class Board : MonoBehaviour
         for (int i = 0; i < _height * _width; i++)
         {
             Crystal crystal = GenerateCrystalInCell(Cells[i].gameObject, i);
+
+            Cells[i].InitialzeCell(crystal, Gravity, this);
+
+            Cells[i].SetNeighbors(FillNeighbors(i));
+        }
+    }
+    public void InitializeBoardFromBoard()
+    {
+        _spawnPoints = new Vector3[_width];
+        Cells = new Cell[_width * _height];
+
+        Cells = gameObject.GetComponentsInChildren<Cell>();
+        for (int i = 0; i < _height * _width; i++)
+        {
+            Crystal crystal = Cells[i].GetComponentInChildren<Crystal>();
 
             Cells[i].InitialzeCell(crystal, Gravity, this);
 

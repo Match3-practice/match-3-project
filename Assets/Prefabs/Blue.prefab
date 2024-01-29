@@ -89,3 +89,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interactionSystem: {fileID: 0}
+  rectTransform: {fileID: 0}
+  type: 1
