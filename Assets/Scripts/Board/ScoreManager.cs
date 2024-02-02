@@ -10,6 +10,7 @@ public class ScoreManager : MonoBehaviour
 
     public event Action OnScoreChange;
     public event Action OnWin;
+    public static event Action<Types> OnCrystalDestroy;
 
     private const int DEF_CRYSTAL_SCORE = 1;
 
@@ -28,10 +29,15 @@ public class ScoreManager : MonoBehaviour
 
     private void Awake()
     {
-        Cell.OnCrystalDestroy += CrysralDestroyHandler;
 
         OnScoreChange += WinChecker;
         OnScoreChange += UpdateScoreLabel;
+        OnCrystalDestroy += CrysralDestroyHandler;
+    }
+
+    public static void InvokeOnCrystalDestroy(Types type)
+    {
+        OnCrystalDestroy?.Invoke(type);
     }
 
     private void UpdateScoreLabel()

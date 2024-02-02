@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using UnityEngine;
 public struct SwapInfo
 {
@@ -21,6 +20,8 @@ public class Cell : MonoBehaviour
     [HideInInspector] public Direction Gravity;
 
     private Crystal _crystal;
+    
+    private Crystal _unlinkedCrystal = null;
     private Neighbors _neighbors;
     public Transform Position { get => gameObject.transform; }
     public bool IsEmpty { get; private set; } = false;
@@ -74,14 +75,19 @@ public class Cell : MonoBehaviour
     {
         if (Crystal != null && Crystal.MustDestroy)
         {
-            DOTweenCrystalAnimService.AnimateDestroy(Crystal.gameObject, Crystal.Destroy, 0.8f);
-
-            OnCrystalDestroy?.Invoke(Crystal.Type);
-
+            _unlinkedCrystal = Crystal;
             Crystal = null;
+            DOTweenCrystalAnimService.AnimateDestroy(_unlinkedCrystal.gameObject,CrystalDestroyAction , 0.8f);
             return true;
         }
         return false;
+    }
+
+    public void CrystalDestroyAction()
+    {
+        ScoreManager.InvokeOnCrystalDestroy(_unlinkedCrystal.Type);
+        _unlinkedCrystal.Destroy();
+        _unlinkedCrystal = null;
     }
 
     public void InitialzeCell(Crystal crystal, Direction gravity, Board parent)
@@ -176,7 +182,7 @@ public class Cell : MonoBehaviour
     {
         Cell lastSwapNeighbor = _lastSwapInfo.NeighborCell;
         if (lastSwapNeighbor == null)
-            return false; 
+            return false;
         return true;
     }
     private void MoveToEmptySpace(Cell cell)
