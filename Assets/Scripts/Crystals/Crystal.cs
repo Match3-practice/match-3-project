@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public class Crystal : MonoBehaviour
 {
+    [SerializeField] private Material material;
+
     public Interaction _interactionSystem;
     public RectTransform rectTransform;
 
@@ -14,22 +16,30 @@ public class Crystal : MonoBehaviour
     private event Action<Direction> _interactAction;
 
 
-    private float dissolveProgress;
+    private bool _isDissolving = false;
+    private float dissolveProgress = 0f;
     private static readonly int Value = Shader.PropertyToID("_Value");
-    private Material _materials;
-
+    private Image image = null;
+    private Material _material = null;
 
     public bool MustDestroy { get; set; } = false;
     private void Start()
     {
         _interactionSystem = gameObject.AddComponent<Interaction>();
         rectTransform = GetComponent<RectTransform>();
-        _materials = GetComponent<Image>()?.material;
+
+        image = gameObject.GetComponent<Image>();
+        _material = Instantiate(material);
+
+        image.material = _material;
 
         _interactionSystem.SwapAction += OnInteract;
-        OnComplete += Destroy;
+        OnComplete += DestroyAction;
     }
-
+    private void FixedUpdate()
+    {
+        CorrosionDissolve();
+    }
     public void OnInteract(Direction direction)
     {
         if (direction != Direction.None)
@@ -38,9 +48,10 @@ public class Crystal : MonoBehaviour
 
     public void ChangePositionInBoard(Cell newCell)
     {
-        transform.SetParent(newCell.transform);
         if (gameObject != null && newCell != null)
             DOTweenCrystalAnimService.AnimatePosition(gameObject, newCell.transform, 0.5f);
+
+        transform.SetParent(newCell.transform);
 
         UnsubscribeAll();
         SubscribeIntercationAction(newCell.TrySwap);
@@ -54,14 +65,16 @@ public class Crystal : MonoBehaviour
         _interactAction += action;
     }
 
-
-
+    public void DestroyCrystal()
+    {
+        _isDissolving = true;
+    }
     public void CorrosionDissolve()
     {
         if (_isDissolving != false)
         {
-            dissolveProgress = Mathf.Clamp01(dissolveProgress - Time.fixedDeltaTime);
-            _materials.SetFloat(Value, dissolveProgress);
+            dissolveProgress = Mathf.Clamp01(dissolveProgress + Time.fixedDeltaTime);
+            _material.SetFloat(Value, dissolveProgress);
 
             if (dissolveProgress == 1)
             {
@@ -70,15 +83,15 @@ public class Crystal : MonoBehaviour
         }
     }
 
-    public void Destroy()
+    public void DestroyAction()
     {
-        
+        ScoreManager.InvokeOnCrystalDestroy(Type);
         Destroy(gameObject);
     }
 
     private void OnDestroy()
     {
         _interactionSystem.SwapAction -= OnInteract;
-        OnComplete -= Destroy;
+        OnComplete -= DestroyAction;
     }
 }
