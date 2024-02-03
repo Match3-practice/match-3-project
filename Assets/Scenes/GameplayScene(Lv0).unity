@@ -1287,7 +1287,7 @@ MonoBehaviour:
   _cellPrefab: {fileID: 0}
   _width: 5
   _height: 5
-  _spacing: 500
+  _spacing: 10
   _isBoardCreated: 1
   Gravity: 3
 --- !u!114 &667984601

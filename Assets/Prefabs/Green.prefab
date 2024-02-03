@@ -52,6 +52,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: 3ffa27ec0b495ab4b915090ff5b2af62, type: 2}
+  crystalSpeed: 0.5
+  dissloveValue: 1
   _interactionSystem: {fileID: 0}
   rectTransform: {fileID: 0}
 --- !u!114 &3403801928091766365

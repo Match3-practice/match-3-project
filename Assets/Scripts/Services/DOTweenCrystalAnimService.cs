@@ -1,4 +1,4 @@
-using DG.Tweening;
+﻿using DG.Tweening;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -46,7 +46,7 @@ public static class DOTweenCrystalAnimService
 
         if (IsAnimated)
             sequence.Join(crystal.transform.DOMove(targetTransform.position, speed))
-                    .Join(crystal.GetComponent<Image>().DOColor(color, speed));
+                    .Join(crystal.GetComponent<Image>().DOColor(color, speed).SetEase(Ease.InExpo));
         
         else
         {
@@ -54,11 +54,11 @@ public static class DOTweenCrystalAnimService
             if (sequence == null || !sequence.active)
                 sequence = DOTween.Sequence();
             sequence.Append(crystal.transform.DOMove(targetTransform.position, speed))
-                    .Join(crystal.GetComponent<Image>().DOColor(color, speed));
+                    .Join(crystal.GetComponent<Image>().DOColor(color, speed).SetEase(Ease.InExpo));
 
         }
     }
-    
+
 
     #region MetodDescription
     ///<summary>
@@ -85,9 +85,19 @@ public static class DOTweenCrystalAnimService
     /// <param name="duration">Animation duration. Default = 1f </param>
     /// <param name="action">Optional action after animation end. You can connect your action to animation thread here. Default = null </param>
     #endregion
-    public static void AnimateDestroy(GameObject crystal, Action action = null, float duration = 1f)
+    public static void AnimateDestroy(Crystal crystal, Action action = null, float duration = 1f)
     {
-        Tween animated = crystal.transform.DOLocalMove(new Vector3(0, -5000f, 0), duration).SetEase(Ease.InBack);
+        crystal.dissloveValue = 0f;
+        Tween animated = DOTween.To(() => crystal.dissloveValue, // Лямбда-функция, возвращающая начальное значение
+                   value => 
+                   {
+                       crystal.SetMaterialValue(value);
+                       crystal.dissloveValue = value;
+                   }, // Лямбда-функция, устанавливающая новое значение
+                   1, // Конечное значение
+                   duration) ; // Длительность анимации
+
+
         if (action != null)
         {
             if (IsAnimated)

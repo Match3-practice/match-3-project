@@ -73,7 +73,7 @@ public class Cell : MonoBehaviour
     {
         if (Crystal != null && Crystal.MustDestroy)
         {
-            Crystal.DestroyCrystal();
+            Crystal.DestroyAction();
 
             Crystal = null;
             return true;

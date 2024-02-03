@@ -11,7 +11,7 @@ public class Board : MonoBehaviour
 
     [SerializeField] [Min(3)] private int _width = 5;
     [SerializeField] [Min(3)] private int _height = 5;
-    [SerializeField] private float _spacing = 10f;
+    [SerializeField] private float _spacing = 2f;
 
     [SerializeField] private bool _isBoardCreated = true;
 
