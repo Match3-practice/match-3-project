@@ -51,6 +51,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28365f92fa4fcd347a6c94a239c37e2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  material: {fileID: 2100000, guid: 3ffa27ec0b495ab4b915090ff5b2af62, type: 2}
   _interactionSystem: {fileID: 0}
   rectTransform: {fileID: 0}
 --- !u!114 &3403801928091766365
@@ -65,6 +66,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f75628597fcc3a4eb41744bf72958ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dissolveProgress: 1
   _materials: {fileID: 2100000, guid: 3ffa27ec0b495ab4b915090ff5b2af62, type: 2}
 --- !u!222 &2381410204689623899
 CanvasRenderer:

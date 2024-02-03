@@ -14,7 +14,6 @@ public class Crystal : MonoBehaviour
     private event Action<Direction> _interactAction;
 
 
-    private bool _isDissolving;
     private float dissolveProgress;
     private static readonly int Value = Shader.PropertyToID("_Value");
     private Material _materials;

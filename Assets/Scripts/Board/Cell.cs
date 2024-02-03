@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using UnityEngine;
 public struct SwapInfo
 {
@@ -74,7 +73,7 @@ public class Cell : MonoBehaviour
     {
         if (Crystal != null && Crystal.MustDestroy)
         {
-            
+            Crystal.DestroyCrystal();
 
             Crystal = null;
             return true;
@@ -174,7 +173,7 @@ public class Cell : MonoBehaviour
     {
         Cell lastSwapNeighbor = _lastSwapInfo.NeighborCell;
         if (lastSwapNeighbor == null)
-            return false; 
+            return false;
         return true;
     }
     private void MoveToEmptySpace(Cell cell)
