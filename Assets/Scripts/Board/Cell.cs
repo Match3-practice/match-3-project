@@ -15,6 +15,48 @@ public struct SwapInfo
         SwapDirection = Direction.None;
     }
 }
+public struct MatchInfo
+{
+    public bool matchVertival;
+    public bool matchHorizontal;
+    public ushort countHorizontalMatch;
+    public ushort countVerticalMatch;
+
+    public MatchInfo(int count = 0)
+    {
+        matchVertival = false;
+        matchHorizontal = false;
+        countHorizontalMatch = 0;
+        countVerticalMatch = 0;
+    }
+
+    public void Match(Direction direction)
+    {
+        if (direction == Direction.Left || direction == Direction.Right)
+            HorizontalMatch();
+        else if (direction == Direction.Top || direction == Direction.Bottom)
+            VerticalMatch();
+    }
+    private void VerticalMatch()
+    {
+        countVerticalMatch++;
+        if (countVerticalMatch >= 3)
+            matchVertival = true;
+        if (countVerticalMatch == 4)
+            Debug.Log("Must create Vertical bomb");
+    }
+
+    private void HorizontalMatch()
+    {
+        matchHorizontal = true;
+        countHorizontalMatch++;
+        if (countHorizontalMatch >= 3)
+            matchHorizontal = true;
+        if (countHorizontalMatch == 4)
+            Debug.Log("Must create Horizontal bomb");
+    }
+
+}
 public class Cell : MonoBehaviour
 {
     [HideInInspector] public Direction Gravity;
@@ -31,7 +73,7 @@ public class Cell : MonoBehaviour
     public event Action EndCheckMatching;
     public event Action FoundCrystalToDestroy;
 
-
+    private MatchInfo _matchInfo;
     public Crystal Crystal
     {
         get => _crystal;
@@ -111,7 +153,9 @@ public class Cell : MonoBehaviour
         StartSwapping?.Invoke(this);
         SwapWithNeighbor(neighbor);
         SaveSwapInfo(neighbor, direction);
-
+        neighbor.SaveSwapInfo(this, direction);
+        CheckMatchAfterSwap();
+        neighbor.CheckMatchAfterSwap();
         EndSwapping?.Invoke();
     }
     private void SaveSwapInfo(Cell cellToSwap, Direction swapDirection)
@@ -123,32 +167,84 @@ public class Cell : MonoBehaviour
         _neighbors = neighbors;
     }
 
+    //check match after end all swap
     private void CheckMatch()
     {
-        if (Crystal != null)
-            CheckMatchByDirection(Direction.Right, GetReverseDirection(Direction.Right));
-        if (Crystal != null)
-            CheckMatchByDirection(Direction.Top, GetReverseDirection(Direction.Top));
+        _matchInfo = new MatchInfo();
+        CheckAllCombinations();
         EndCheckMatch();
     }
+    //check match immediately after swap
+    private void CheckMatchAfterSwap()
+    {
+        _matchInfo = new MatchInfo();
+        CheckAllCombinations();
+    }
+
+    private void CheckAllCombinations()
+    {
+        if (Crystal != null)
+        {
+            //check the match on both sides
+            bool hasMatch3 = CheckMatchBy2Direction(Direction.Right, GetReverseDirection(Direction.Right));
+            if (!hasMatch3)
+            {
+                //check the match on one side only
+                CheckMatchBy1Direction(Direction.Right);
+                //check the match on one side only
+                CheckMatchBy1Direction(Direction.Left);
+            }
+        }
+        if (Crystal != null)
+        {
+            //check the match on both sides
+            bool hasMatch3 = CheckMatchBy2Direction(Direction.Top, GetReverseDirection(Direction.Top));
+            if (!hasMatch3)
+            {
+                CheckMatchBy1Direction(Direction.Top);
+                CheckMatchBy1Direction(Direction.Bottom);
+            }
+        }
+    }
+
 
     private void EndCheckMatch()
     {
         EndCheckMatching?.Invoke();
     }
-    private void CheckMatchByDirection(Direction direction, Direction directionReverse)
+    private bool CheckMatchBy2Direction(Direction direction, Direction directionReverse)
     {
         if (HasNeighborSameTypeCrystal(direction) && HasNeighborSameTypeCrystal(directionReverse))
         {
             Cell neighborForward = GetNeighbor(direction);
             Cell neighborBackward = GetNeighbor(directionReverse);
 
+            if (neighborForward.Crystal.MustDestroy && neighborBackward.Crystal.MustDestroy)
+                return false;
             CheckNeighborsMatch(neighborForward, direction);
             CheckNeighborsMatch(neighborBackward, directionReverse);
             MarkCrystalToDestroy(Crystal);
             FoundCrystalToDestroy?.Invoke();
+            _matchInfo.Match(direction);
+            return true;
+        }
+        return false;
+    }
+    private void CheckMatchBy1Direction(Direction direction)
+    {
+        Cell neighbor1 = GetNeighbor(direction);
+        Cell neighbor2 = neighbor1?.GetNeighbor(direction);
+        if (neighbor1 == null || neighbor2 == null || neighbor1.Crystal.MustDestroy || neighbor2.Crystal.MustDestroy)
+            return;
+        if (Crystal.Type == neighbor1.Crystal.Type && Crystal.Type == neighbor2.Crystal.Type)
+        {
+            CheckNeighborsMatch(neighbor1, direction);
+            MarkCrystalToDestroy(Crystal);
+            FoundCrystalToDestroy?.Invoke();
+            _matchInfo.Match(direction);
         }
     }
+
 
     private void CheckNeighborsMatch(Cell cell, Direction direction)
     {
@@ -157,10 +253,12 @@ public class Cell : MonoBehaviour
         if (neighbor == null || neighbor.Crystal == null || neighbor.Crystal.Type != cell.Crystal.Type)
         {
             MarkCrystalToDestroy(cell.Crystal);
+            _matchInfo.Match(direction);
             return;
         }
         CheckNeighborsMatch(neighbor, direction);
         MarkCrystalToDestroy(cell.Crystal);
+        _matchInfo.Match(direction);
     }
     public void Restore()
     {
@@ -183,9 +281,9 @@ public class Cell : MonoBehaviour
         {
             return;
         }
-        if (cell.Crystal != null)
-            Debug.Log(neighbor.gameObject.name);
-        Debug.Log(cell.gameObject.name);
+        //if (cell.Crystal != null)
+        //    Debug.Log(neighbor.gameObject.name);
+        //Debug.Log(cell.gameObject.name);
 
 
         DebugRay(cell);
