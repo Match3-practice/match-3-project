@@ -31,7 +31,7 @@ public class Board : MonoBehaviour
     private Vector3[] _spawnPoints;
     public bool MustUpdateBoard { get; set; }
     private Cell _swappedCell;
-    private string savePath = "DebugEmpty/NeedToImplement";
+    private string savePath = null;
 
     private void Awake()
     {
@@ -48,7 +48,17 @@ public class Board : MonoBehaviour
 
     private void OnDestroy()
     {
-        SaveManager.SaveGame(savePath, this.GetComponentsInChildren<Crystal>());
+        SaveManager.SaveGame(savePath, GetAllCrystals(Cells));
+    }
+
+    private Crystal[] GetAllCrystals(Cell[] cells)
+    {
+        var crystals = new Crystal[cells.Length];
+        for (int i = 0; i < cells.Length; i++)
+        {
+            crystals[i] = cells[i].Crystal;
+        }
+        return crystals;
     }
 
     private void InitializeBoard()

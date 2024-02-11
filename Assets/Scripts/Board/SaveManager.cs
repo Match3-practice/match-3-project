@@ -6,6 +6,7 @@ public static class SaveManager
 
     public static void SaveGame(string path, Crystal[] crystals)
     {
+        if (crystals.Length == 0) return;
         string jsonTypes = JsonConvert.SerializeObject(GetTypes(crystals));
 
         File.WriteAllText(path, jsonTypes);
@@ -22,7 +23,6 @@ public static class SaveManager
 
         return JsonConvert.DeserializeObject<Types[]>(jsonTypes);
     }
-    //private static Crystal[] GetAllCrystals() => board.GetComponentsInChildren<Crystal>();
 
     private static Types[] GetTypes(Crystal[] crystals)
     {
