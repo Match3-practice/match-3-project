@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,8 +11,8 @@ public class Board : MonoBehaviour
 
     [SerializeField] private GameObject _cellPrefab;
 
-    [SerializeField] [Min(3)] private int _width = 5;
-    [SerializeField] [Min(3)] private int _height = 5;
+    [SerializeField][Min(3)] private int _width = 5;
+    [SerializeField][Min(3)] private int _height = 5;
     [SerializeField] private float _spacing = 2f;
 
     [SerializeField] private bool _isBoardCreated = true;
@@ -29,6 +31,12 @@ public class Board : MonoBehaviour
     private Vector3[] _spawnPoints;
     public bool MustUpdateBoard { get; set; }
     private Cell _swappedCell;
+    private string savePath = null;
+
+    private void Awake()
+    {
+        savePath = Path.Combine(Application.dataPath, "PrevBoardSave.data");
+    }
 
     private void Start()
     {
@@ -38,19 +46,73 @@ public class Board : MonoBehaviour
             InitializeBoardFromZero();
     }
 
+    private void OnDestroy()
+    {
+        SaveManager.SaveGame(savePath, GetAllCrystals(Cells));
+    }
+
+    private Crystal[] GetAllCrystals(Cell[] cells)
+    {
+        var crystals = new Crystal[cells.Length];
+        for (int i = 0; i < cells.Length; i++)
+        {
+            crystals[i] = cells[i].Crystal;
+        }
+        return crystals;
+    }
+
     private void InitializeBoard()
     {
         _spawnPoints = new Vector3[_width];
         Cells = gameObject.GetComponentsInChildren<Cell>();
-        for (int i = 0; i < _height * _width; i++)
+
+
+        if (File.Exists(savePath))
         {
-            Crystal crystal = GenerateCrystalInCell(Cells[i].gameObject, i);
+            Types[] types = null;
+            if (TryLoad(savePath, out types))
+            {
+                if (types.Length <= 0)
+                    Debug.Log($"Types length is {types.Length}");
+                for (int i = 0; i < _height * _width; i++)
+                {
+                    Crystal crystal = GenerateSpecificCrystal(Cells[i].gameObject, types[i]);
+                    InitCell(i, crystal);
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < _height * _width; i++)
+            {
+                Crystal crystal = GenerateCrystalInCell(Cells[i].gameObject, i);
 
-            Cells[i].InitialzeCell(crystal, Gravity, this);
-
-            Cells[i].SetNeighbors(FillNeighbors(i));
+                InitCell(i, crystal);
+            }
         }
     }
+
+    private void InitCell(int i, Crystal crystal)
+    {
+        Cells[i].InitialzeCell(crystal, Gravity, this);
+        Cells[i].SetNeighbors(FillNeighbors(i));
+    }
+
+    private bool TryLoad(string savePath, out Types[] types)
+    {
+        if (savePath != null)
+        {
+            types = SaveManager.LoadGame(savePath);
+            if (types == null) return false;
+            return true;
+        }
+        else
+        {
+            types = null;
+            return false;
+        }
+    }
+
     public void InitializeBoardFromZero()
     {
         _spawnPoints = new Vector3[_width];
@@ -253,7 +315,17 @@ public class Board : MonoBehaviour
         return crystal;
     }
 
-    private Crystal GenerateCrystalInPoint(Vector3 point,GameObject parent = null)
+
+    private Crystal GenerateSpecificCrystal(GameObject cell, Types type)
+    {
+        CrystalData crystalData = _setOfCrystals.FirstOrDefault(crystal => crystal.Type == type);
+        GameObject crystalPrefab = Instantiate(crystalData.Prefab, cell.transform);
+        Crystal crystal = crystalPrefab.GetComponent<Crystal>();
+        crystal.Type = crystalData.Type;
+        return crystal;
+    }
+
+    private Crystal GenerateCrystalInPoint(Vector3 point, GameObject parent = null)
     {
         if (_setOfCrystals.Length == 0)
         {
@@ -347,5 +419,7 @@ public class Board : MonoBehaviour
         color.a = 0f;
         crystalPrefab.GetComponent<Image>().color = color;
     }
+
+
 
 }
