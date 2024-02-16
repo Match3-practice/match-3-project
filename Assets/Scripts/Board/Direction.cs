@@ -6,3 +6,9 @@
     Bottom,
     None
 }
+
+public struct BombCellArg
+{
+    public Cell CurentCell;
+    public BombType Type;
+}

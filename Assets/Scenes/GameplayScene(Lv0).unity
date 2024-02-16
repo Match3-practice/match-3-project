@@ -1290,6 +1290,7 @@ MonoBehaviour:
   _spacing: 10
   _isBoardCreated: 1
   Gravity: 3
+  bomb: {fileID: 11400000, guid: 4f042126f55835b4c93e5e06b36282cf, type: 2}
 --- !u!114 &667984601
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -89,3 +89,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Gravity: 0
+  crystal: {fileID: 11400000, guid: d79a2aec5896fbc4398b210905e897c5, type: 2}

@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
 
 public class Board : MonoBehaviour
 {
@@ -29,6 +31,11 @@ public class Board : MonoBehaviour
     private Vector3[] _spawnPoints;
     public bool MustUpdateBoard { get; set; }
     private Cell _swappedCell;
+
+    [SerializeField]
+    CrystalData bomb;
+
+    public event Action createBomb;
 
     private void Start()
     {
@@ -160,13 +167,14 @@ public class Board : MonoBehaviour
             {
                 ClearMustDestroyedCrystals();
                 DOTweenCrystalAnimService.EndAnimations();
+                createBomb?.Invoke();
+                createBomb = null;
                 CheckEmptySpaces();
                 DOTweenCrystalAnimService.EndAnimations();
                 SpawnCrystalsAfterStep();
                 DOTweenCrystalAnimService.EndAnimations();
                 if (_isNeedClearCrystals)
                     StartCheckingMatch();
-
                 MustUpdateBoard = false;
             }
             else if (!MustUpdateBoard && _swappedCell != null)
@@ -341,6 +349,21 @@ public class Board : MonoBehaviour
         }
         return crystalData;
     }
+
+    public void NeedCreateBomb(Cell cell, BombType type)
+    {
+        createBomb+=() => CreateBomb(cell, type);
+    }
+    public void CreateBomb(Cell cell, BombType type)
+    {
+        GameObject crystalPrefab = Instantiate(bomb.Prefab, cell.transform);
+        Crystal crystalobj = crystalPrefab.GetComponent<Crystal>();
+        crystalobj.Type = bomb.Type;
+        cell.InitializeCrystal(crystalobj);
+        MakeTransparent(crystalPrefab);
+        DOTweenCrystalAnimService.AnimateCreateBomb(crystalPrefab, null,0.2f);
+    }
+
     private static void MakeTransparent(GameObject crystalPrefab)
     {
         Color color = crystalPrefab.GetComponent<Image>().color;

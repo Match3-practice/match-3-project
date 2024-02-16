@@ -8,11 +8,13 @@ public class Crystal : MonoBehaviour
     [SerializeField] private float crystalSpeed = .5f;
 
     public float dissloveValue = 1.0f;   
-    public Interaction _interactionSystem;
+    public Interaction _interactionSystem; 
     public RectTransform rectTransform;
 
 
-    public Types Type { get; set; }
+    public Types Type { get => type; set { type = value; } }
+    [SerializeField]
+    private Types type;
     public Vector2 Position { get => transform.localPosition; }
 
     public event Action OnComplete;

@@ -10,6 +10,13 @@ public enum Types
     White
 }
 
+public enum BombType
+{
+    Vertical,
+    Horizontal
+
+}
+
 [CreateAssetMenu(fileName = "Crystal Data", menuName = "Match 3/Crystal Data")]
 public class CrystalData : ScriptableObject
 {

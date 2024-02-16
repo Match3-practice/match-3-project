@@ -42,8 +42,8 @@ public struct MatchInfo
         countVerticalMatch++;
         if (countVerticalMatch >= 3)
             matchVertival = true;
-        if (countVerticalMatch == 4)
-            Debug.Log("Must create Vertical bomb");
+        //if (countVerticalMatch == 4)
+        //    Debug.Log("Must create Vertical bomb");
     }
 
     private void HorizontalMatch()
@@ -52,8 +52,8 @@ public struct MatchInfo
         countHorizontalMatch++;
         if (countHorizontalMatch >= 3)
             matchHorizontal = true;
-        if (countHorizontalMatch == 4)
-            Debug.Log("Must create Horizontal bomb");
+        //if (countHorizontalMatch == 4)
+        //    Debug.Log("Must create Horizontal bomb");
     }
 
 }
@@ -72,6 +72,7 @@ public class Cell : MonoBehaviour
     public event Action EndSwapping;
     public event Action EndCheckMatching;
     public event Action FoundCrystalToDestroy;
+    public event Action<Cell, BombType> MustCreateBomb;
 
     private MatchInfo _matchInfo;
     public Crystal Crystal
@@ -172,15 +173,34 @@ public class Cell : MonoBehaviour
     {
         _matchInfo = new MatchInfo();
         CheckAllCombinations();
-        EndCheckMatch();
+       if (!Result())
+            EndCheckMatch();
     }
     //check match immediately after swap
     private void CheckMatchAfterSwap()
     {
         _matchInfo = new MatchInfo();
         CheckAllCombinations();
+        Result();
     }
 
+    private bool Result()
+    {
+        if (_matchInfo.countHorizontalMatch > 3)
+        {
+            MustCreateBomb?.Invoke(this, BombType.Horizontal);
+            Debug.Log("Must create Horizontal bomb");
+            return true;
+        }
+        if (_matchInfo.countVerticalMatch > 3)
+        {
+            MustCreateBomb?.Invoke(this, BombType.Vertical);
+            Debug.Log("Must create Vertical bomb");
+            return true;
+        }
+        return false;
+
+    }
     private void CheckAllCombinations()
     {
         if (Crystal != null)
@@ -219,7 +239,7 @@ public class Cell : MonoBehaviour
             Cell neighborForward = GetNeighbor(direction);
             Cell neighborBackward = GetNeighbor(directionReverse);
 
-            if (neighborForward.Crystal.MustDestroy && neighborBackward.Crystal.MustDestroy)
+            if (neighborForward.Crystal.MustDestroy || neighborBackward.Crystal.MustDestroy)
                 return false;
             CheckNeighborsMatch(neighborForward, direction);
             CheckNeighborsMatch(neighborBackward, directionReverse);
@@ -323,6 +343,7 @@ public class Cell : MonoBehaviour
         EndCheckMatching = parent.CellEndCheckMaching;
         parent._startCheckingMatch += CheckMatch;
         FoundCrystalToDestroy = () => parent.MustUpdateBoard = true;
+        MustCreateBomb += parent.NeedCreateBomb;
     }
 
     private void SwapWithNeighbor(Cell neighbor)

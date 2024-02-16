@@ -115,6 +115,24 @@ public static class DOTweenCrystalAnimService
         IsAnimated = true;
     }
 
+    public static void AnimateCreateBomb(GameObject crystal, Transform targetTransform, float speed = 1f)
+    {
+        Color color = GetNonTransparentColor(crystal);
+        //crystal.transform.localScale = targetTransform.localScale;
+
+        if (IsAnimated)
+            sequence
+                    .Join(crystal.GetComponent<Image>().DOColor(color, speed).SetEase(Ease.InExpo));
+        else
+        {
+            IsAnimated = true;
+            if (sequence == null || !sequence.active)
+                sequence = DOTween.Sequence();
+            sequence.Append(crystal.GetComponent<Image>().DOColor(color, speed).SetEase(Ease.InExpo));
+
+        }
+    }
+
     private static Color GetNonTransparentColor(GameObject crystal)
     {
         Color color = crystal.GetComponent<Image>().color;

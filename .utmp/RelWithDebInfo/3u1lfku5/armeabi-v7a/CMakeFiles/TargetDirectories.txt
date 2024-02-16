@@ -1,0 +1,5 @@
+G:/Projects/Unity/GitHub/Match-3-project/.utmp/RelWithDebInfo/3u1lfku5/armeabi-v7a/CMakeFiles/edit_cache.dir
+G:/Projects/Unity/GitHub/Match-3-project/.utmp/RelWithDebInfo/3u1lfku5/armeabi-v7a/CMakeFiles/rebuild_cache.dir
+G:/Projects/Unity/GitHub/Match-3-project/.utmp/RelWithDebInfo/3u1lfku5/armeabi-v7a/FramePacing/CMakeFiles/swappywrapper.dir
+G:/Projects/Unity/GitHub/Match-3-project/.utmp/RelWithDebInfo/3u1lfku5/armeabi-v7a/FramePacing/CMakeFiles/edit_cache.dir
+G:/Projects/Unity/GitHub/Match-3-project/.utmp/RelWithDebInfo/3u1lfku5/armeabi-v7a/FramePacing/CMakeFiles/rebuild_cache.dir
