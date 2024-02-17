@@ -8,6 +8,9 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
+	"last_search.5A656512" = "ref=\"/-- OBJECTS --/GameArea/DustMotesEffect\""
+	"OpenInspectorPreview.5A656512" = "0"
+	"currentGroup.5A656512" = null
 }
 providers = {
 	log = {
@@ -53,6 +56,11 @@ providers = {
 	packages = {
 		active = true
 		priority = 90
+		defaultAction = null
+	}
+	presets_provider = {
+		active = false
+		priority = -10
 		defaultAction = null
 	}
 }
